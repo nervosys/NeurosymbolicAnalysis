@@ -1,0 +1,4 @@
+https://github.com/microsoft/vscode-codicons at ceaa8663a7e63e2bac7f1ecac128ce31404b7487
+The icon font inside monaco-editor (codicon.ttf). The repository licenses the font and other content under CC-BY-4.0 (LICENSE) and its code under MIT (LICENSE-CODE).
+monaco-editor records no codicons version, so these are the files at this revision, not at the revision its font was built from.
+Fetched 2026-11-01 with curl from raw.githubusercontent.com.

@@ -1,0 +1,14 @@
+# A crate that exists to be complained about.
+#
+# `[workspace]` is empty and present on purpose: it detaches this from the
+# workspace above, so `cargo test --workspace` never builds it and its
+# deliberate defects never reach the toolkit's own self-scan.
+[package]
+name = "rust-panic-corpus"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lints]

@@ -1,0 +1,396 @@
+# MISRA C++:2023 catalogue.
+#
+# COMPLETENESS: PARTIAL, AND DELIBERATELY SO.
+#
+# MISRA C++:2023 renumbered every guideline against the C++ standard's own
+# clause structure, superseding both MISRA C++:2008 and AUTOSAR C++14. Unlike
+# the C:2023 numbering — which is stable, widely published, and carried forward
+# from C:2012 — the C++:2023 numbering is not something this toolkit will
+# reproduce from memory, because a *wrong* rule number in a compliance report is
+# worse than a missing one: it corrupts the audit trail.
+#
+# So this catalogue ships two things:
+#
+#   1. The clause index below, which is the document's real organising
+#      structure. Native C++ checks that have no confirmed rule number cite
+#      their clause, so a reviewer can find the governing guideline.
+#   2. Individual rules, each carrying `confirmed`. Only `confirmed = true`
+#      entries are cited by rule number in a compliance report.
+#
+# To get a complete, citable catalogue, license the document and run:
+#     sda rules import --standard misra-cpp-2023 <file.csv|file.toml>
+# which merges an authoritative list over this one. `sda rules audit` reports
+# what is still missing.
+
+standard = "MISRA C++:2023"
+language = "cpp"
+completeness = "partial"
+
+# --- Clause index (the document's organising structure) --------------------
+[[clause]]
+n = "0"
+t = "Language independent issues"
+[[clause]]
+n = "4"
+t = "General principles"
+[[clause]]
+n = "5"
+t = "Lexical conventions"
+[[clause]]
+n = "6"
+t = "Basic concepts"
+[[clause]]
+n = "7"
+t = "Standard conversions"
+[[clause]]
+n = "8"
+t = "Expressions"
+[[clause]]
+n = "9"
+t = "Statements"
+[[clause]]
+n = "10"
+t = "Declarations"
+[[clause]]
+n = "11"
+t = "Declarators"
+[[clause]]
+n = "12"
+t = "Classes"
+[[clause]]
+n = "13"
+t = "Templates"
+[[clause]]
+n = "15"
+t = "Special member functions"
+[[clause]]
+n = "16"
+t = "Overloading"
+[[clause]]
+n = "18"
+t = "Exception handling"
+[[clause]]
+n = "19"
+t = "Preprocessing directives"
+[[clause]]
+n = "21"
+t = "Language support library"
+[[clause]]
+n = "22"
+t = "Diagnostics library"
+[[clause]]
+n = "23"
+t = "General utilities library"
+[[clause]]
+n = "24"
+t = "Strings library"
+[[clause]]
+n = "25"
+t = "Containers library"
+[[clause]]
+n = "26"
+t = "Iterators library"
+[[clause]]
+n = "28"
+t = "Algorithms library"
+[[clause]]
+n = "30"
+t = "Input/output library"
+
+# --- Rules -----------------------------------------------------------------
+# `confirmed = false` entries are checked by the native engine and reported
+# against their clause, not their number, until reconciled with the document.
+
+[[rule]]
+n = "0.0.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+clause = "0"
+confirmed = true
+cwe = 561
+
+[[rule]]
+n = "5.7.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "5"
+confirmed = false
+
+[[rule]]
+n = "5.7.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "5"
+confirmed = false
+
+[[rule]]
+n = "5.13.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "5"
+confirmed = false
+
+[[rule]]
+n = "5.13.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "5"
+confirmed = false
+
+[[rule]]
+n = "8.2.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "8"
+confirmed = false
+cwe = 704
+
+[[rule]]
+n = "8.2.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "8"
+confirmed = false
+cwe = 704
+
+[[rule]]
+n = "8.2.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "8"
+confirmed = false
+cwe = 704
+
+[[rule]]
+n = "8.18.1"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+clause = "8"
+confirmed = false
+cwe = 475
+
+[[rule]]
+n = "9.4.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "9"
+confirmed = false
+cwe = 483
+
+[[rule]]
+n = "9.4.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "9"
+confirmed = false
+cwe = 484
+
+[[rule]]
+n = "9.4.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "9"
+confirmed = false
+cwe = 478
+
+[[rule]]
+n = "9.6.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "9"
+confirmed = false
+
+[[rule]]
+n = "10.1.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+clause = "10"
+confirmed = false
+
+[[rule]]
+n = "11.3.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "11"
+confirmed = false
+
+[[rule]]
+n = "12.2.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "12"
+confirmed = false
+cwe = 843
+
+[[rule]]
+n = "15.1.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+clause = "15"
+confirmed = false
+cwe = 415
+
+[[rule]]
+n = "18.1.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+clause = "18"
+confirmed = false
+
+[[rule]]
+n = "18.3.1"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+clause = "18"
+confirmed = false
+cwe = 248
+
+[[rule]]
+n = "18.5.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+clause = "18"
+confirmed = false
+
+[[rule]]
+n = "19.0.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "19"
+confirmed = false
+
+[[rule]]
+n = "19.3.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "19"
+confirmed = false
+
+[[rule]]
+n = "19.6.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "19"
+confirmed = false
+
+[[rule]]
+n = "21.6.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "21"
+confirmed = false
+cwe = 401
+
+[[rule]]
+n = "21.10.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "21"
+confirmed = false
+
+[[rule]]
+n = "21.10.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "21"
+confirmed = false
+
+[[rule]]
+n = "23.11.1"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "semantics"
+clause = "23"
+confirmed = false
+
+[[rule]]
+n = "24.5.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "24"
+confirmed = false
+cwe = 787
+
+[[rule]]
+n = "25.5.1"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+clause = "25"
+confirmed = false
+cwe = 416
+
+[[rule]]
+n = "26.3.1"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+clause = "26"
+confirmed = false
+cwe = 125
+
+[[rule]]
+n = "30.0.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+clause = "30"
+confirmed = false

@@ -1,0 +1,5 @@
+https://www.mozilla.org/media/MPL/2.0/index.txt
+Crate: selectors 0.36.1, licence MPL-2.0 (Cargo.toml). The crate ships no licence file, and the servo/stylo
+tree at its revision 635e1a19d02960588a00e189bd4bd5bdb150ec3d has no root licence file, so this is the
+licence text as its steward publishes it.
+Fetched 2026-11-01.

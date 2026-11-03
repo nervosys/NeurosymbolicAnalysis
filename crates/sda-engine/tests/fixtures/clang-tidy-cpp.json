@@ -1,0 +1,85 @@
+{
+ "clang_tidy": "LLVM (http://llvm.org/): LLVM version 21.1.6 Optimized build with assertions.",
+ "cases": [
+  {
+   "path": "tools/misra-cpp-corpus/casts_and_calls.cpp",
+   "findings": [
+    {
+     "line": 12,
+     "guideline": "8.2.1",
+     "check": "google-readability-casting"
+    },
+    {
+     "line": 17,
+     "guideline": "8.2.2",
+     "check": "cppcoreguidelines-pro-type-reinterpret-cast"
+    },
+    {
+     "line": 22,
+     "guideline": "8.2.3",
+     "check": "cppcoreguidelines-pro-type-const-cast"
+    },
+    {
+     "line": 28,
+     "guideline": "21.6.1",
+     "check": "cppcoreguidelines-no-malloc"
+    },
+    {
+     "line": 32,
+     "guideline": "21.6.1",
+     "check": "cppcoreguidelines-no-malloc"
+    },
+    {
+     "line": 41,
+     "guideline": "9.6.1",
+     "check": "cppcoreguidelines-avoid-goto"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-cpp-corpus/macros_and_unions.hpp",
+   "findings": [
+    {
+     "line": 1,
+     "guideline": "19.6.1",
+     "check": "llvm-header-guard"
+    },
+    {
+     "line": 7,
+     "guideline": "19.0.1",
+     "check": "cppcoreguidelines-macro-usage"
+    },
+    {
+     "line": 18,
+     "guideline": "12.2.1",
+     "check": "cppcoreguidelines-pro-type-union-access"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-cpp-corpus/control_flow.cpp",
+   "findings": [
+    {
+     "line": 12,
+     "guideline": "9.4.1",
+     "check": "readability-braces-around-statements"
+    },
+    {
+     "line": 21,
+     "guideline": "9.4.3",
+     "check": "clang-diagnostic-switch-default"
+    },
+    {
+     "line": 24,
+     "guideline": "9.4.2",
+     "check": "clang-diagnostic-implicit-fallthrough"
+    },
+    {
+     "line": 35,
+     "guideline": "21.10.1",
+     "check": "cert-err52-cpp"
+    }
+   ]
+  }
+ ]
+}

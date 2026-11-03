@@ -1,0 +1,16 @@
+[package]
+name = "sda-adapters"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Adapters that bring industry-standard analysis tools in behind the same Analyzer trait as the native engines"
+
+[dependencies]
+sda-core.workspace = true
+sda-build.workspace = true
+sda-ontology.workspace = true
+serde.workspace = true
+serde_json.workspace = true

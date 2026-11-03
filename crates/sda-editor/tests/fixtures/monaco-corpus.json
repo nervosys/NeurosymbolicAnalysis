@@ -1,0 +1,13 @@
+[
+  {"name": "plain", "text": "int main(void) {\n    return 0;\n}\n"},
+  {"name": "no-trailing-newline", "text": "one\ntwo"},
+  {"name": "trailing-newline", "text": "one\ntwo\n"},
+  {"name": "two-trailing-newlines", "text": "one\n\n"},
+  {"name": "empty", "text": ""},
+  {"name": "crlf", "text": "one\r\ntwo\r\n"},
+  {"name": "astral", "text": "a😀b\ncd\n"},
+  {"name": "astral-only", "text": "😀😀\n"},
+  {"name": "bmp-accents", "text": "café\nnaïve\n"},
+  {"name": "combining", "text": "éx\n"},
+  {"name": "tabs", "text": "\tif (x) {\n\t\ty();\n\t}\n"}
+]

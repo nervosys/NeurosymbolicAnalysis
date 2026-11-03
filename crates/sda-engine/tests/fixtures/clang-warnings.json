@@ -1,0 +1,49 @@
+{
+ "clang": "clang version 21.1.6",
+ "cases": [
+  {
+   "path": "tools/misra-corpus/control_flow.c",
+   "warnings": [
+    {
+     "line": 77,
+     "guideline": "2.6"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/lexical.c",
+   "warnings": [
+    {
+     "line": 6,
+     "guideline": "3.1"
+    },
+    {
+     "line": 22,
+     "guideline": "3.2"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/atomic_void.c",
+   "warnings": [
+    {
+     "line": 17,
+     "guideline": "11.10"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-cpp-corpus/comments.cpp",
+   "warnings": [
+    {
+     "line": 8,
+     "guideline": "5.7.1"
+    },
+    {
+     "line": 11,
+     "guideline": "5.7.2"
+    }
+   ]
+  }
+ ]
+}

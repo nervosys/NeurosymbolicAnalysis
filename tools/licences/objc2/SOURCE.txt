@@ -1,0 +1,38 @@
+https://github.com/madsmtm/objc2 commit ee9a7ada2131f5944b8750428e265c15632f2a19
+Crates (19, all from madsmtm/objc2): block2 0.6.2, dispatch2 0.3.1, objc2 0.6.4, objc2-app-kit 0.3.2, objc2-cloud-kit 0.3.2, objc2-core-data 0.3.2, objc2-core-foundation 0.3.2, objc2-core-graphics 0.3.2, objc2-core-image 0.3.2, objc2-core-location 0.3.2, objc2-core-text 0.3.2, objc2-encode 4.1.0, objc2-exception-helper 0.1.1, objc2-foundation 0.3.2, objc2-io-surface 0.3.2, objc2-quartz-core 0.3.2, objc2-ui-kit 0.3.2, objc2-user-notifications 0.3.2, objc2-web-kit 0.3.2
+
+The release tags of these crates (checked: block2-0.6.2, objc2-0.6.4, dispatch2-0.3.1, objc2-encode-4.1.0,
+objc2-exception-helper-0.1.1, and frameworks-0.3.2 for the framework crates) carry only LICENSE.md at the
+repository root. LICENSE.md describes the Zlib, Apache-2.0 and MIT terms in prose and does not contain their
+texts, and the published crates ship no licence file either.
+
+The four files in this directory are the project's own licence files from a later revision: LICENSE-MIT.txt,
+LICENSE-APACHE.txt, LICENSE-ZLIB.txt and LICENSE.md, all at commit ee9a7ada21 (2026-03-18, "Include license text
+in the repository"), which is the first commit to touch LICENSE-MIT.txt. They are not files shipped with the
+crates. Each was fetched unchanged with curl from
+https://raw.githubusercontent.com/madsmtm/objc2/ee9a7ada2131f5944b8750428e265c15632f2a19/<file name>
+on 2026-11-02.
+
+LICENSE.md, at that commit, says the following about Apple SDKs and Xcode. Quoted verbatim, as a disclosure of
+what the upstream project states; it is not a conclusion about whether these crates may be distributed.
+
+Furthermore, the crates are (usually automatically) derived from Apple SDKs,
+and that may have implications for licensing, see below for details.
+
+## Apple SDKs
+
+These crates are derived from Apple SDKs shipped with Xcode. You can obtain a
+copy of the Xcode license at:
+
+https://www.apple.com/legal/sla/docs/xcode.pdf
+
+Or by typing `xcodebuild -license` in your terminal.
+
+From reading the license, it is unclear whether distributing derived works
+such as these crates are allowed?
+
+But in any case, to practically use these crates, you will have to link, and
+that only works when you have the correct Xcode SDK available to provide the
+required `.tbd` files, which is why we choose to still use the normal SPDX
+identifiers in the crates (Xcode is required to use the crates, and when using
+Xcode you have already agreed to the Xcode license).

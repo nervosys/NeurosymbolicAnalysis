@@ -1,0 +1,12 @@
+{"t":"cov","f":"src/main.c","l":77,"n":1}
+{"t":"val","f":"src/main.c","l":81,"k":"checksum","v":84}
+{"t":"cov","f":"src/main.c","l":64,"n":1}
+{"t":"cov","f":"src/main.c","l":69,"n":1}
+{"t":"cov","f":"src/main.c","l":64,"n":1}
+{"t":"cov","f":"src/main.c","l":69,"n":1}
+{"t":"cov","f":"src/main.c","l":64,"n":1}
+{"t":"cov","f":"src/main.c","l":69,"n":1}
+{"t":"cov","f":"src/main.c","l":64,"n":1}
+{"t":"fault","f":"src/main.c","l":66,"k":"bounds","m":"field index past the end of the frame"}
+{"t":"val","f":"src/main.c","l":151,"k":"decoded","v":32}
+{"t":"mark","k":"stack_bytes","v":632}

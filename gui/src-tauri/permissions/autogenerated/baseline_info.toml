@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-baseline-info"
+description = "Enables the baseline_info command without any pre-configured scope."
+commands.allow = ["baseline_info"]
+
+[[permission]]
+identifier = "deny-baseline-info"
+description = "Denies the baseline_info command without any pre-configured scope."
+commands.deny = ["baseline_info"]

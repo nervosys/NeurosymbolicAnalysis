@@ -1,0 +1,35 @@
+[package]
+name = "sda-workbench"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.88"
+license = "AGPL-3.0-or-later"
+description = "The StatodynamicAnalysis workbench (Tauri shell)"
+
+# Its own workspace: the GUI pulls in Tauri and a webview toolchain, and none of
+# that should slow down `cargo test` on the analysis crates.
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+portable-pty = "0.9"
+
+sda-core = { path = "../../crates/sda-core" }
+sda-rules = { path = "../../crates/sda-rules" }
+sda-engine = { path = "../../crates/sda-engine" }
+sda-adapters = { path = "../../crates/sda-adapters" }
+sda-build = { path = "../../crates/sda-build" }
+sda-ai = { path = "../../crates/sda-ai" }
+sda-agent = { path = "../../crates/sda-agent" }
+sda-editor = { path = "../../crates/sda-editor" }
+
+[features]
+default = []
+# Swap the Tauri shell for a Dewey one. Scaffolded, not wired here: see
+# gui/README.md for the seam it plugs into.
+dewey = []

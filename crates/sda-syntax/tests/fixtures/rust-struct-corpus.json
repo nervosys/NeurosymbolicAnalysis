@@ -1,0 +1,114 @@
+[
+ {
+  "name": "simple-unsafe-block",
+  "text": "fn f() {\n    unsafe {\n        let _ = 1;\n    }\n}\n"
+ },
+ {
+  "name": "brace-in-string",
+  "text": "fn f() {\n    unsafe {\n        let s = \"}\";\n        let _ = s;\n    }\n}\n"
+ },
+ {
+  "name": "brace-in-char",
+  "text": "fn f() {\n    unsafe {\n        let c = '}';\n        let _ = c;\n    }\n}\n"
+ },
+ {
+  "name": "brace-in-comment",
+  "text": "fn f() {\n    unsafe {\n        // }\n        let _ = 1;\n    }\n}\n"
+ },
+ {
+  "name": "brace-in-block-comment",
+  "text": "fn f() {\n    unsafe {\n        /* } */\n        let _ = 1;\n    }\n}\n"
+ },
+ {
+  "name": "brace-in-raw-string",
+  "text": "fn f() {\n    unsafe {\n        let s = r#\"}\"#;\n        let _ = s;\n    }\n}\n"
+ },
+ {
+  "name": "nested-blocks",
+  "text": "fn f() {\n    unsafe {\n        {\n            let _ = 1;\n        }\n    }\n}\n"
+ },
+ {
+  "name": "two-unsafe-blocks",
+  "text": "fn f() {\n    unsafe {\n        let _ = 1;\n    }\n    unsafe {\n        let _ = 2;\n    }\n}\n"
+ },
+ {
+  "name": "unsafe-fn-with-block",
+  "text": "unsafe fn g() {\n    unsafe {\n        let _ = 1;\n    }\n}\n"
+ },
+ {
+  "name": "one-line-block",
+  "text": "fn f() { unsafe { let _ = 1; } }\n"
+ },
+ {
+  "name": "items-of-every-kind",
+  "text": "use core::mem;\nconst C: u8 = 1;\nstatic S: u8 = 2;\nstatic mut M: u8 = 3;\nstruct T { a: u8 }\nenum E { A }\nunion U { a: u8 }\ntype A = u8;\ntrait Tr { fn m(&self); }\nimpl Tr for T { fn m(&self) {} }\nmod m2 { }\nfn h() {}\nunsafe extern \"C\" { fn ext(); }\n"
+ },
+ {
+  "name": "attributes-on-items",
+  "text": "#[derive(Debug)]\nstruct S;\n\n#[test]\nfn t() {}\n"
+ },
+ {
+  "name": "attribute-run",
+  "text": "#[derive(Debug, Clone)]\n#[repr(C)]\n#[non_exhaustive]\npub struct Frame {\n    len: usize,\n}\n"
+ },
+ {
+  "name": "attribute-does-not-carry-to-the-next-item",
+  "text": "#[derive(Debug)]\nstruct A;\nstruct B;\n"
+ },
+ {
+  "name": "attribute-with-bracket-in-string",
+  "text": "#[doc = \"a ] bracket\"]\nfn f() {}\n"
+ },
+ {
+  "name": "multi-line-attribute",
+  "text": "#[cfg(all(\n    feature = \"a\",\n    not(test)\n))]\nfn f() {}\n"
+ },
+ {
+  "name": "attribute-with-a-comment-between",
+  "text": "#[test]\n// why this is a test\nfn f() {}\n"
+ },
+ {
+  "name": "inner-attribute-above-an-item",
+  "text": "#![allow(dead_code)]\n#[derive(Debug)]\nstruct S;\n"
+ },
+ {
+  "name": "doc-comment-above-an-item",
+  "text": "/// What this does.\n#[inline]\nfn f() {}\n"
+ },
+ {
+  "name": "attribute-on-every-kind",
+  "text": "#[repr(C)]\nstruct S;\n#[derive(Debug)]\nenum E { A }\n#[allow(dead_code)]\nconst C: u8 = 1;\n#[no_mangle]\nstatic G: u8 = 2;\n#[allow(dead_code)]\nmod m {}\n"
+ },
+ {
+  "name": "panic-methods",
+  "text": "fn a(v: Option<u8>) -> u8 {\n    let x = v.unwrap();\n    let y = v.expect(\"needed\");\n    x + y\n}\n"
+ },
+ {
+  "name": "panic-macros",
+  "text": "fn a(n: u8) -> u8 {\n    if n == 0 {\n        panic!(\"zero\");\n    }\n    if n == 1 {\n        unreachable!();\n    }\n    if n == 2 {\n        todo!();\n    }\n    n\n}\n"
+ },
+ {
+  "name": "panic-assert-macros",
+  "text": "fn a(n: u8) {\n    assert!(n > 0);\n    assert_eq!(n, 1);\n    assert_ne!(n, 2);\n}\n"
+ },
+ {
+  "name": "panic-spelled-in-a-string",
+  "text": "fn a() -> &'static str {\n    \"v.unwrap() and panic!()\"\n}\n"
+ },
+ {
+  "name": "panic-spelled-in-a-comment",
+  "text": "fn a() -> u8 {\n    // v.unwrap() would panic!()\n    0u8\n}\n"
+ },
+ {
+  "name": "panic-nested-and-repeated",
+  "text": "fn a(v: Option<u8>, w: Option<u8>) -> u8 {\n    let f = || w.unwrap();\n    v.unwrap() + v.expect(\"x\") + f()\n}\n"
+ },
+ {
+  "name": "braces-inside-items-that-end-at-a-semicolon",
+  "text": "use std::collections::{\n    HashMap,\n    HashSet,\n};\nstruct S {\n    a: u8,\n}\nconst C: S = S {\n    a: 1,\n};\nstatic T: S = S {\n    a: 2,\n};\ntype M = HashMap<u8, HashSet<u8>>;\nfn after() {\n}\n"
+ },
+ {
+  "name": "semicolons-inside-a-signature",
+  "text": "fn takes(x: [u8; 4]) -> u8 {\n    x[0]\n}\nfn gives() -> [u8; 2] {\n    [0; 2]\n}\nstruct Wrap([u8; 4]);\nstruct Named {\n    a: [u8; 3],\n}\n"
+ }
+]

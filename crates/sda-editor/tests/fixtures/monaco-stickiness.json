@@ -1,0 +1,257 @@
+{
+ "note": "range [5,10) before each edit",
+ "cases": [
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "insert at the range start",
+   "editStart": 5,
+   "editEnd": 5,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "insert at the range end",
+   "editStart": 10,
+   "editEnd": 10,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "insert strictly inside",
+   "editStart": 7,
+   "editEnd": 7,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "insert strictly before",
+   "editStart": 2,
+   "editEnd": 2,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "insert strictly after",
+   "editStart": 12,
+   "editEnd": 12,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "replace the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 2,
+   "start": 5,
+   "end": 7
+  },
+  {
+   "stickiness": "always-grows-when-typing-at-edges",
+   "edit": "delete the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 0,
+   "start": 5,
+   "end": 5
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "insert at the range start",
+   "editStart": 5,
+   "editEnd": 5,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "insert at the range end",
+   "editStart": 10,
+   "editEnd": 10,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "insert strictly inside",
+   "editStart": 7,
+   "editEnd": 7,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "insert strictly before",
+   "editStart": 2,
+   "editEnd": 2,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "insert strictly after",
+   "editStart": 12,
+   "editEnd": 12,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "replace the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 2,
+   "start": 5,
+   "end": 7
+  },
+  {
+   "stickiness": "never-grows-when-typing-at-edges",
+   "edit": "delete the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 0,
+   "start": 5,
+   "end": 5
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "insert at the range start",
+   "editStart": 5,
+   "editEnd": 5,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "insert at the range end",
+   "editStart": 10,
+   "editEnd": 10,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "insert strictly inside",
+   "editStart": 7,
+   "editEnd": 7,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "insert strictly before",
+   "editStart": 2,
+   "editEnd": 2,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "insert strictly after",
+   "editStart": 12,
+   "editEnd": 12,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "replace the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 2,
+   "start": 5,
+   "end": 7
+  },
+  {
+   "stickiness": "grows-only-when-typing-before",
+   "edit": "delete the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 0,
+   "start": 5,
+   "end": 5
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "insert at the range start",
+   "editStart": 5,
+   "editEnd": 5,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "insert at the range end",
+   "editStart": 10,
+   "editEnd": 10,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "insert strictly inside",
+   "editStart": 7,
+   "editEnd": 7,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "insert strictly before",
+   "editStart": 2,
+   "editEnd": 2,
+   "insertedLength": 3,
+   "start": 8,
+   "end": 13
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "insert strictly after",
+   "editStart": 12,
+   "editEnd": 12,
+   "insertedLength": 3,
+   "start": 5,
+   "end": 10
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "replace the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 2,
+   "start": 5,
+   "end": 7
+  },
+  {
+   "stickiness": "grows-only-when-typing-after",
+   "edit": "delete the whole range",
+   "editStart": 5,
+   "editEnd": 10,
+   "insertedLength": 0,
+   "start": 5,
+   "end": 5
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+https://github.com/OpenByteDev/dlopen2 commit cc80e4a0a90d499b677fdf7743699b4b3a43a989 (no tag matches the version)
+Crates: dlopen2 0.8.2 and dlopen2_derive 0.4.3, licence MIT (Cargo.toml). Repository field: https://github.com/OpenByteDev/dlopen2
+The commit is the one recorded in .cargo_vcs_info.json of the published dlopen2 0.8.2 crate. The repository's tags stop at v0.2.0.
+Fetched 2026-10-31 with curl from https://raw.githubusercontent.com/OpenByteDev/dlopen2/cc80e4a0a90d499b677fdf7743699b4b3a43a989/LICENSE

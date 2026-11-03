@@ -1,0 +1,50 @@
+/target
+target/
+**/target/
+gui/dist/
+dist/
+gui/node_modules/
+# The sda sidecar staged by tools/stage-sda-sidecar.sh: a build product, not source.
+gui/src-tauri/binaries/
+compile_commands.json
+self-scan.json
+examples/coverage/build/*
+!examples/coverage/build/main.c.gcov
+# The Cortex-M image and its capture, rebuilt by
+# examples/firmware-cortex-m/build-and-run.sh.
+examples/firmware-cortex-m/build/
+tools/valgrind-wsl/*.exe
+
+# CodeQL databases, which are tens to hundreds of megabytes and are rebuilt by
+# the commands in each directory's README.
+tools/codeql-taint/db/
+tools/codeql-taint-cpp/db/
+tools/codeql-taint-cpp/tainted.exe
+
+# Generated scan output. The negation matters: `*.sarif` used to be blanket, and
+# it excluded the three captured tool fixtures that `include_str!` depends on —
+# a fresh clone would not have compiled.
+*.sarif
+!**/tests/fixtures/*.sarif
+
+# Generated `.sda` state only. `.sda/` used to be blanket, which excluded the
+# toolkit's own `.sda/deviations.toml` — the 9 approved deviations that keep
+# `sda scan crates` clean — plus the two worked examples the README documents.
+# A fresh clone would have had a self-scan that was not clean and an example
+# that did not reproduce.
+.sda/crashes/
+.sda/swe-session.json
+
+# Python bytecode from the oracle and sweep scripts in tools/. One .pyc was
+# committed and lived in the tree until a sweep script was added next to it;
+# the gate checks the repository's top level, and this sat one directory down.
+__pycache__/
+*.pyc
+
+# Signing keys and secrets must never be committed.
+*.pfx
+*.p12
+*.pem
+*.key
+*.jks
+.env

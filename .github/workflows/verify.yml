@@ -1,0 +1,44 @@
+# The same gate a commit has to pass locally, on both platforms the toolkit
+# claims to run on. The gate is `tools/verify.sh` and nothing else, so this file
+# cannot drift into checking something different from what a person ran.
+name: verify
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Tauri system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev
+      - name: Frontend
+        working-directory: gui
+        run: |
+          npm ci
+          npm run build
+      - name: Gate
+        shell: bash
+        run: bash tools/verify.sh

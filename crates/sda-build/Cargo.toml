@@ -1,0 +1,14 @@
+[package]
+name = "sda-build"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Pluggable compiler and build-system backends: toolchain probing, compile_commands.json, instrumented build profiles, and unified diagnostic parsing"
+
+[dependencies]
+sda-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true

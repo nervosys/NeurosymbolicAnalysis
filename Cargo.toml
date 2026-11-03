@@ -1,0 +1,58 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/sda-core",
+    "crates/sda-syntax",
+    "crates/sda-engine",
+    "crates/sda-adapters",
+    "crates/sda-build",
+    "crates/sda-probe",
+    "crates/sda-ontology",
+    "crates/sda-rules",
+    "crates/sda-ai",
+    "crates/sda-agent",
+    "crates/sda-editor",
+    "crates/sda-cli",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.88"
+license = "AGPL-3.0-or-later"
+authors = ["NERVOSYS"]
+repository = "https://github.com/nervosys/NeurosymbolicAnalysis"
+description = "Agentic-first statodynamic (static + dynamic) code and AI-model analysis toolkit"
+
+[workspace.dependencies]
+sda-core = { path = "crates/sda-core", version = "1.0.0" }
+sda-syntax = { path = "crates/sda-syntax", version = "1.0.0" }
+sda-engine = { path = "crates/sda-engine", version = "1.0.0" }
+sda-adapters = { path = "crates/sda-adapters", version = "1.0.0" }
+sda-build = { path = "crates/sda-build", version = "1.0.0" }
+sda-ontology = { path = "crates/sda-ontology", version = "1.0.0" }
+sda-rules = { path = "crates/sda-rules", version = "1.0.0" }
+sda-ai = { path = "crates/sda-ai", version = "1.0.0" }
+sda-agent = { path = "crates/sda-agent", version = "1.0.0" }
+sda-editor = { path = "crates/sda-editor", version = "1.0.0" }
+
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.9"
+clap = { version = "4", features = ["derive", "env"] }
+walkdir = "2"
+regex = "1"
+sha2 = "0.10"
+time = { version = "0.3", features = ["formatting", "macros"] }
+ropey = "1.6"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-comment-on-finding"
+description = "Enables the comment_on_finding command without any pre-configured scope."
+commands.allow = ["comment_on_finding"]
+
+[[permission]]
+identifier = "deny-comment-on-finding"
+description = "Denies the comment_on_finding command without any pre-configured scope."
+commands.deny = ["comment_on_finding"]

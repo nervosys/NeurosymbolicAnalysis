@@ -1,0 +1,4 @@
+{"reason":"compiler-artifact","package_id":"demo 0.1.0 (path+file:///demo)","target":{"kind":["bin"],"name":"demo"}}
+{"reason":"compiler-message","package_id":"demo 0.1.0 (path+file:///demo)","message":{"level":"warning","message":"the loop variable `i` is only used to index `v`","code":{"code":"clippy::needless_range_loop"},"spans":[{"file_name":"src/main.rs","line_start":4,"column_start":14,"line_end":4,"column_end":24,"is_primary":true}]}}
+{"reason":"compiler-message","package_id":"demo 0.1.0 (path+file:///demo)","message":{"level":"error","message":"mismatched types","code":{"code":"E0308"},"spans":[{"file_name":"src/lib.rs","line_start":9,"column_start":5,"line_end":9,"column_end":13,"is_primary":true}]}}
+{"reason":"build-finished","success":false}

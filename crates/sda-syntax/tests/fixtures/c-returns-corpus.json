@@ -1,0 +1,42 @@
+[
+ {
+  "name": "single-return",
+  "text": "int f(int a)\n{\n    return a;\n}\n"
+ },
+ {
+  "name": "two-returns",
+  "text": "int g(int a, int b)\n{\n    if (a > b) {\n        return a;\n    }\n    return b;\n}\n"
+ },
+ {
+  "name": "no-return-void",
+  "text": "void h(void)\n{\n    int x = 1;\n    (void)x;\n}\n"
+ },
+ {
+  "name": "early-returns",
+  "text": "int k(int n)\n{\n    if (n < 0) { return -1; }\n    if (n == 0) { return 0; }\n    while (n > 10) { n -= 10; }\n    return n;\n}\n"
+ },
+ {
+  "name": "return-in-switch",
+  "text": "int s(int n)\n{\n    switch (n) {\n    case 1: return 10;\n    case 2: return 20;\n    default: break;\n    }\n    return 0;\n}\n"
+ },
+ {
+  "name": "nested-function-like",
+  "text": "int outer(int a)\n{\n    int inner = a;\n    if (inner) {\n        if (inner > 1) {\n            return 2;\n        }\n        return 1;\n    }\n    return 0;\n}\n"
+ },
+ {
+  "name": "return-with-comment",
+  "text": "int c(void)\n{\n    /* return 99; */\n    return 1; // return 98;\n}\n"
+ },
+ {
+  "name": "return-in-string",
+  "text": "int t(void)\n{\n    const char *s = \"return 5;\";\n    (void)s;\n    return 0;\n}\n"
+ },
+ {
+  "name": "two-functions",
+  "text": "int a1(void) { return 1; }\nint a2(void) { return 2; }\n"
+ },
+ {
+  "name": "void-with-bare-return",
+  "text": "void v(int n)\n{\n    if (n) {\n        return;\n    }\n    n = 0;\n    (void)n;\n}\n"
+ }
+]

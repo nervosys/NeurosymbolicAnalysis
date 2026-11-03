@@ -1,0 +1,22 @@
+[package]
+name = "sda-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The native NERVOSYS statodynamic engines: default static checkers, dynamic observation, and the correlation engine that fuses them"
+
+[dependencies]
+sda-core.workspace = true
+sda-syntax.workspace = true
+sda-rules.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+walkdir.workspace = true
+
+[dev-dependencies]
+# Only for tests that drive the interposition refutation with a real taint
+# report, which must be parsed by the same code a user's report goes through.
+sda-adapters.workspace = true

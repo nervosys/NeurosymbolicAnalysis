@@ -1,0 +1,27 @@
+[package]
+name = "sda-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The `sda` command-line interface"
+
+[[bin]]
+name = "sda"
+path = "src/main.rs"
+
+[dependencies]
+sda-core.workspace = true
+sda-syntax.workspace = true
+sda-rules.workspace = true
+sda-engine.workspace = true
+sda-adapters.workspace = true
+sda-ontology.workspace = true
+sda-build.workspace = true
+sda-ai.workspace = true
+sda-agent.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true

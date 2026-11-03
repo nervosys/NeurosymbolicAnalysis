@@ -1,0 +1,4 @@
+https://github.com/rust-lang/rust tag 1.99.1, commit 58cf8f9c35b355199727627d07ae34a4e2846d67
+Crate: ra-ap-rustc_lexer 0.174.0, licence MIT OR Apache-2.0 (Cargo.toml). The crate is rust-analyzer's publication of compiler/rustc_lexer from rust-lang/rust.
+The crate records no revision: it has no .cargo_vcs_info.json, so no exact upstream commit is identified. These are the licence files of the project it is published from (rust-lang/rust, the most recent stable release tag, 1.99.1), not of a revision of the crate.
+Fetched 2026-11-01 with curl from https://raw.githubusercontent.com/rust-lang/rust/58cf8f9c35b355199727627d07ae34a4e2846d67/LICENSE-MIT and LICENSE-APACHE

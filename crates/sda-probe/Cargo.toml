@@ -1,0 +1,16 @@
+[package]
+name = "sda-probe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The SDA probe instrumentation: emits the coverage and fault stream the correlation engine consumes"
+
+[dependencies]
+
+[dev-dependencies]
+sda-engine.workspace = true
+sda-core.workspace = true
+

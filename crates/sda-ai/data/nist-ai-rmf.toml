@@ -1,0 +1,128 @@
+# NIST AI Risk Management Framework 1.0 (AI RMF), structural index.
+#
+# https://www.nist.gov/itl/ai-risk-management-framework
+#
+# The AI RMF is a voluntary framework organised into four functions — GOVERN,
+# MAP, MEASURE, MANAGE — each with categories and subcategories. It is published
+# by NIST and is not licence-restricted, but it is also *not* a checklist: most
+# subcategories describe an organisational outcome, not a property of an
+# artifact. This index therefore records, for each subcategory this toolkit
+# touches, whether evidence for it can be produced mechanically at all.
+#
+#   evidence = tool     a scan or probe can produce real evidence
+#   evidence = partial  a scan contributes evidence but cannot discharge it
+#   evidence = process  no tool can discharge this; it needs an organisational record
+#
+# Reporting `process` subcategories as "passing" because a scan was clean would be
+# precisely the kind of governance theatre the framework exists to prevent.
+
+framework = "NIST AI RMF 1.0"
+
+# --- GOVERN: culture, policy, accountability -------------------------------
+[[subcategory]]
+id = "GOVERN 1.1"
+title = "Legal and regulatory requirements are understood and managed"
+evidence = "process"
+
+[[subcategory]]
+id = "GOVERN 1.3"
+title = "Risk management processes are proportionate to the AI system's potential impact"
+evidence = "process"
+
+[[subcategory]]
+id = "GOVERN 5.1"
+title = "Organisational policies provide for collecting and integrating external feedback about impacts"
+evidence = "process"
+
+[[subcategory]]
+id = "GOVERN 6.1"
+title = "Policies address risks from third-party AI resources, including provenance and licensing"
+evidence = "partial"
+
+# --- MAP: context and risk identification ----------------------------------
+[[subcategory]]
+id = "MAP 1.1"
+title = "The AI system's intended purpose, setting, and expected users are documented"
+evidence = "process"
+
+[[subcategory]]
+id = "MAP 2.3"
+title = "Scientific integrity and TEVV considerations are identified and documented"
+evidence = "process"
+
+[[subcategory]]
+id = "MAP 3.4"
+title = "Processes for human oversight of AI system outputs are defined and documented"
+evidence = "partial"
+
+[[subcategory]]
+id = "MAP 4.1"
+title = "Approaches for mapping third-party AI risks are in place, including licences and provenance"
+evidence = "tool"
+
+[[subcategory]]
+id = "MAP 5.1"
+title = "Likelihood and magnitude of each identified impact are characterised"
+evidence = "process"
+
+# --- MEASURE: analysis, testing, and metrics -------------------------------
+[[subcategory]]
+id = "MEASURE 2.5"
+title = "The AI system is evaluated for validity and reliability under expected conditions"
+evidence = "tool"
+
+[[subcategory]]
+id = "MEASURE 2.6"
+title = "The AI system is evaluated for safety risks, including in deployment conditions"
+evidence = "partial"
+
+[[subcategory]]
+id = "MEASURE 2.7"
+title = "AI system security and resilience are evaluated and documented"
+evidence = "tool"
+
+[[subcategory]]
+id = "MEASURE 2.8"
+title = "Risks associated with transparency and accountability are examined and documented"
+evidence = "partial"
+
+[[subcategory]]
+id = "MEASURE 2.10"
+title = "Privacy risk of the AI system is examined and documented"
+evidence = "partial"
+
+[[subcategory]]
+id = "MEASURE 2.11"
+title = "Fairness and bias are evaluated and results documented"
+evidence = "partial"
+
+[[subcategory]]
+id = "MEASURE 3.1"
+title = "Approaches for identifying difficult-to-assess risks are in place"
+evidence = "process"
+
+# --- MANAGE: response, monitoring, and recovery ----------------------------
+[[subcategory]]
+id = "MANAGE 1.3"
+title = "Responses to the most significant risks are developed, planned, and documented"
+evidence = "process"
+
+[[subcategory]]
+id = "MANAGE 2.2"
+title = "Mechanisms are in place to sustain the value of the AI system and to mitigate identified risks"
+evidence = "partial"
+
+[[subcategory]]
+id = "MANAGE 2.3"
+title = "Procedures are followed to respond to and recover from a previously unknown risk"
+evidence = "process"
+
+[[subcategory]]
+id = "MANAGE 3.1"
+title = "AI risks from third-party resources are regularly monitored and managed"
+evidence = "tool"
+
+[[subcategory]]
+id = "MANAGE 4.1"
+title = "Post-deployment monitoring plans are implemented, including for emergent risks"
+evidence = "partial"

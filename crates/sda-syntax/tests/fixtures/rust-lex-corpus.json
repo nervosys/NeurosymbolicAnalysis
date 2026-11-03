@@ -1,0 +1,58 @@
+[
+ {
+  "name": "plain",
+  "text": "fn main() { let x = 1; }\n"
+ },
+ {
+  "name": "lifetimes-vs-chars",
+  "text": "fn f<'a>(x: &'a str) -> char { let c = 'x'; let q = '\\''; c }\n"
+ },
+ {
+  "name": "lifetime-underscore",
+  "text": "fn g<'_>(v: &'_ [u8]) {}\n"
+ },
+ {
+  "name": "nested-block-comment",
+  "text": "/* outer /* inner */ still outer */ fn h() {}\n"
+ },
+ {
+  "name": "doc-comments",
+  "text": "/// outer doc\n//! inner doc\n/** block doc */\n/*! inner block */\nfn i() {}\n"
+ },
+ {
+  "name": "raw-strings",
+  "text": "let a = r\"plain\";\nlet b = r#\"has \"quotes\"\"#;\nlet c = r##\"has \"# inside\"##;\n"
+ },
+ {
+  "name": "byte-and-c-strings",
+  "text": "let a = b\"bytes\";\nlet b = b'x';\nlet c = c\"cstr\";\n"
+ },
+ {
+  "name": "numbers",
+  "text": "let v = [1_000u64, 0xFFu8, 0b1010_i32, 0o77, 1.0e-3f64, 1., 2.5f32];\n"
+ },
+ {
+  "name": "raw-identifiers",
+  "text": "let r#fn = 1; let r#struct = r#fn;\n"
+ },
+ {
+  "name": "operators",
+  "text": "let a = 1..=2; let b = x << 2; let c: fn() -> u8 = f; m!(|x| x => y);\n"
+ },
+ {
+  "name": "shift-and-generics",
+  "text": "let v: Vec<Vec<u8>> = Vec::new();\n"
+ },
+ {
+  "name": "unicode-ident",
+  "text": "let café = 1; let naïve = café;\n"
+ },
+ {
+  "name": "char-escapes",
+  "text": "let a = '\\n'; let b = '\\u{1F600}'; let c = '\\\\';\n"
+ },
+ {
+  "name": "unterminated-ish",
+  "text": "let s = \"ok\"; let t = \"also ok\";\n"
+ }
+]

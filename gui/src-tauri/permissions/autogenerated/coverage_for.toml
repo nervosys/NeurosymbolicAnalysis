@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-coverage-for"
+description = "Enables the coverage_for command without any pre-configured scope."
+commands.allow = ["coverage_for"]
+
+[[permission]]
+identifier = "deny-coverage-for"
+description = "Denies the coverage_for command without any pre-configured scope."
+commands.deny = ["coverage_for"]

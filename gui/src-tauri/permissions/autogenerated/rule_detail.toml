@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-rule-detail"
+description = "Enables the rule_detail command without any pre-configured scope."
+commands.allow = ["rule_detail"]
+
+[[permission]]
+identifier = "deny-rule-detail"
+description = "Denies the rule_detail command without any pre-configured scope."
+commands.deny = ["rule_detail"]

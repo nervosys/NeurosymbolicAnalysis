@@ -1,0 +1,1203 @@
+{
+ "cppcheck": "Cppcheck 2.21.0",
+ "cases": [
+  {
+   "path": "examples/firmware/src/main.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-16.3"
+    },
+    {
+     "line": 26,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-15.6"
+    },
+    {
+     "line": 34,
+     "rule": "misra-c2012-7.1"
+    },
+    {
+     "line": 35,
+     "rule": "misra-c2012-15.1"
+    },
+    {
+     "line": 41,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 41,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 43,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 43,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 44,
+     "rule": "misra-c2012-15.7"
+    },
+    {
+     "line": 47,
+     "rule": "misra-c2012-21.3"
+    }
+   ]
+  },
+  {
+   "path": "examples/coverage/main.c",
+   "findings": [
+    {
+     "line": 21,
+     "rule": "misra-c2012-11.5"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-11.5"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 32,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 42,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 42,
+     "rule": "misra-c2012-21.6"
+    }
+   ]
+  },
+  {
+   "path": "tools/valgrind-wsl/three-sins/main.c",
+   "findings": [
+    {
+     "line": 5,
+     "rule": "misra-c2012-10.4"
+    },
+    {
+     "line": 5,
+     "rule": "misra-c2012-11.5"
+    },
+    {
+     "line": 5,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-15.6"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-11.5"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-17.7"
+    }
+   ]
+  },
+  {
+   "path": "tools/valgrind-wsl/vgwrap.c",
+   "findings": [
+    {
+     "line": 13,
+     "rule": "misra-c2012-21.8"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-10.4"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-10.4"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-10.4"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-10.4"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-17.7"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-21.21"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/aggregates.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-19.2"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-2.4"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-19.2"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/alignment.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 23,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 29,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-1.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/assembly.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-17.3"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-17.3"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/conditionals.c",
+   "findings": [
+    {
+     "line": 8,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 8,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-20.14"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/control_flow.c",
+   "findings": [
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-15.6"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-15.6"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-15.7"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 27,
+     "rule": "misra-c2012-12.3"
+    },
+    {
+     "line": 27,
+     "rule": "misra-c2012-14.2"
+    },
+    {
+     "line": 34,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 40,
+     "rule": "misra-c2012-15.1"
+    },
+    {
+     "line": 40,
+     "rule": "misra-c2012-15.2"
+    },
+    {
+     "line": 46,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 49,
+     "rule": "misra-c2012-15.4"
+    },
+    {
+     "line": 61,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 64,
+     "rule": "misra-c2012-15.6"
+    },
+    {
+     "line": 72,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 75,
+     "rule": "misra-c2012-15.5"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/declarations.c",
+   "findings": [
+    {
+     "line": 4,
+     "rule": "misra-c2012-2.4"
+    },
+    {
+     "line": 5,
+     "rule": "misra-c2012-6.2"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-19.2"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-8.2"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-8.11"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-8.10"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.14"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-17.6"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 43,
+     "rule": "misra-c2012-18.5"
+    },
+    {
+     "line": 43,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/directives.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-20.13"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-8.7"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/expressions.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-11.9"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 25,
+     "rule": "misra-c2012-17.8"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 32,
+     "rule": "misra-c2012-13.3"
+    },
+    {
+     "line": 32,
+     "rule": "misra-c2012-17.8"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 40,
+     "rule": "misra-c2012-13.4"
+    },
+    {
+     "line": 41,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 47,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/function_macros.c",
+   "findings": [
+    {
+     "line": 11,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-14.4"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 25,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 36,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/identifiers.c",
+   "findings": [
+    {
+     "line": 10,
+     "rule": "misra-c2012-5.4"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-5.5"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 23,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 23,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 24,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 24,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 29,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 32,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/include_form.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 6,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-20.1"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-20.2"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-20.1"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-20.3"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.7"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/include_twice.c",
+   "findings": [
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/invariant.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 18,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/lexical.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-3.1"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-3.1"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-7.1"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-7.3"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 13,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-4.1"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-4.1"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 24,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 24,
+     "rule": "misra-c2012-8.7"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/library.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-21.4"
+    },
+    {
+     "line": 8,
+     "rule": "misra-c2012-21.5"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-21.10"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-17.1"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-17.1"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-17.1"
+    },
+    {
+     "line": 23,
+     "rule": "misra-c2012-17.1"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 31,
+     "rule": "misra-c2012-15.5"
+    },
+    {
+     "line": 33,
+     "rule": "misra-c2012-17.2"
+    },
+    {
+     "line": 37,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 39,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 42,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 44,
+     "rule": "misra-c2012-21.3"
+    },
+    {
+     "line": 48,
+     "rule": "misra-c2012-8.9"
+    },
+    {
+     "line": 50,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 55,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 55,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 60,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 66,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 68,
+     "rule": "misra-c2012-21.6"
+    },
+    {
+     "line": 72,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 74,
+     "rule": "misra-c2012-21.7"
+    },
+    {
+     "line": 78,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 80,
+     "rule": "misra-c2012-21.8"
+    },
+    {
+     "line": 86,
+     "rule": "misra-c2012-11.5"
+    },
+    {
+     "line": 89,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 91,
+     "rule": "misra-c2012-21.9"
+    },
+    {
+     "line": 95,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 101,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 103,
+     "rule": "misra-c2012-21.12"
+    },
+    {
+     "line": 107,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 109,
+     "rule": "misra-c2012-21.21"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/literals.c",
+   "findings": [
+    {
+     "line": 9,
+     "rule": "misra-c2012-4.2"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 12,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 16,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 19,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-8.7"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/memory_order.c",
+   "findings": [
+    {
+     "line": 6,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 9,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 27,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/noreturn.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-1.4"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/preprocessor.c",
+   "findings": [
+    {
+     "line": 4,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 4,
+     "rule": "misra-c2012-20.4"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-21.1"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 17,
+     "rule": "misra-c2012-20.7"
+    },
+    {
+     "line": 20,
+     "rule": "misra-c2012-20.10"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 21,
+     "rule": "misra-c2012-20.10"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-20.10"
+    },
+    {
+     "line": 22,
+     "rule": "misra-c2012-20.11"
+    },
+    {
+     "line": 25,
+     "rule": "misra-c2012-20.5"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 28,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 29,
+     "rule": "misra-c2012-20.1"
+    },
+    {
+     "line": 33,
+     "rule": "misra-c2012-2.5"
+    },
+    {
+     "line": 34,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 34,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 36,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 38,
+     "rule": "misra-c2012-12.1"
+    },
+    {
+     "line": 41,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/random_numbers.c",
+   "findings": [
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 15,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/reserved.c",
+   "findings": [
+    {
+     "line": 2,
+     "rule": "misra-c2012-21.11"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 7,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 8,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 8,
+     "rule": "misra-c2012-8.7"
+    },
+    {
+     "line": 10,
+     "rule": "misra-c2012-8.4"
+    }
+   ]
+  },
+  {
+   "path": "tools/misra-corpus/switches.c",
+   "findings": [
+    {
+     "line": 8,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-16.4"
+    },
+    {
+     "line": 11,
+     "rule": "misra-c2012-16.6"
+    },
+    {
+     "line": 14,
+     "rule": "misra-c2012-16.3"
+    },
+    {
+     "line": 23,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 30,
+     "rule": "misra-c2012-16.5"
+    },
+    {
+     "line": 41,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 44,
+     "rule": "misra-c2012-16.6"
+    },
+    {
+     "line": 54,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 60,
+     "rule": "misra-c2012-16.2"
+    },
+    {
+     "line": 73,
+     "rule": "misra-c2012-8.4"
+    },
+    {
+     "line": 77,
+     "rule": "misra-c2012-16.1"
+    },
+    {
+     "line": 78,
+     "rule": "misra-c2012-16.3"
+    }
+   ]
+  }
+ ]
+}

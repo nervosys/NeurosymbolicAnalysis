@@ -1,0 +1,41 @@
+{
+ "clippy": "clippy 0.1.98 (48a229ceae 2026-09-01)",
+ "crate_dir": "tools/rust-edition-corpus",
+ "sites": [
+  {
+   "line": 14,
+   "guideline": "UNSAFE.1",
+   "lint": "clippy::undocumented_unsafe_blocks"
+  },
+  {
+   "line": 15,
+   "guideline": "UNSAFE.4",
+   "lint": "static_mut_refs"
+  },
+  {
+   "line": 22,
+   "guideline": "ED2024.3",
+   "lint": "missing_unsafe_on_extern"
+  },
+  {
+   "line": 28,
+   "guideline": "ED2024.4",
+   "lint": "unsafe_attr_outside_unsafe"
+  },
+  {
+   "line": 34,
+   "guideline": "ED2024.1",
+   "lint": "keyword_idents_2024"
+  },
+  {
+   "line": 44,
+   "guideline": "UNSAFE.2",
+   "lint": "clippy::missing_safety_doc"
+  },
+  {
+   "line": 45,
+   "guideline": "UNSAFE.1",
+   "lint": "clippy::undocumented_unsafe_blocks"
+  }
+ ]
+}

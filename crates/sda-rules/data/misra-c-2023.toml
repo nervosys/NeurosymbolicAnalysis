@@ -1,0 +1,1599 @@
+# MISRA C:2023 rule and directive catalogue: identifiers and classification only.
+#
+# The text of each guideline is copyright MISRA, and this file carries no title,
+# because nobody has compared a paraphrase with the licensed document. Anyone who
+# holds it can supply titles through `sda rules import`.
+#
+# Fields
+#   n  guideline number ("15.5", "D4.12")
+#   o  obligation: mandatory | required | advisory
+#   d  decidability: decidable | undecidable
+#   s  scope: single | system     (single translation unit vs whole program)
+#   c  native coverage: native | partial | semantics | dynamic | external | manual
+#        native    — the native engine checks this fully
+#        partial   — checked with known gaps, confidence reduced accordingly
+#        semantics — needs type/flow information; routed to a compiler via sda-build
+#        dynamic   — best established by the dynamic engine at runtime
+#        external  — delegated to an external adapter when enabled
+#        manual    — a process obligation, not mechanically checkable
+#   cwe optional CWE cross-reference
+
+standard = "MISRA C:2023"
+language = "c"
+# Reconciled against: MISRA C:2012 with Amendments 1-4 and TC1-TC2, as
+# consolidated in MISRA C:2023. Run `sda rules audit` to compare this catalogue
+# against an authoritative list you supply with `sda rules import`.
+
+# --- Directives ------------------------------------------------------------
+[[rule]]
+n = "D1.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "manual"
+
+[[rule]]
+n = "D2.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "external"
+
+[[rule]]
+n = "D3.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "manual"
+
+[[rule]]
+n = "D4.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "D4.2"
+o = "advisory"
+d = "undecidable"
+s = "single"
+c = "partial"
+
+[[rule]]
+n = "D4.3"
+o = "required"
+d = "decidable"
+s = "single"
+# `partial`, not `native`: "encapsulated and isolated" is a judgement, and the
+# engine stands in for it with a threshold -- assembly in a function of more
+# than two statements. `__asm__ volatile ("nop"); g();` is two, so it passes.
+# A clean D4.3 result is not evidence of conformance.
+c = "partial"
+
+[[rule]]
+n = "D4.4"
+o = "advisory"
+d = "undecidable"
+s = "single"
+# `partial`, not `native`: the guideline is undecidable — telling commented-out
+# code from prose that mentions code is a judgement, and the engine makes it with
+# a heuristic. A clean D4.4 result is not a proof, which is what `native` claims.
+c = "partial"
+
+[[rule]]
+n = "D4.5"
+o = "advisory"
+d = "decidable"
+s = "system"
+# `partial`, not `native`: the guideline is judged across the whole program, and
+# the comparison is made within one file's identifier list. `lookup1` in one file
+# and `l00kup1` in another are not compared. Demonstrated by
+# `system_scope_needs_the_whole_program.rs`.
+c = "partial"
+
+[[rule]]
+n = "D4.6"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "D4.7"
+o = "required"
+d = "undecidable"
+s = "single"
+c = "semantics"
+cwe = 252
+
+[[rule]]
+n = "D4.8"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "D4.9"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "D4.10"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "D4.11"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 20
+
+[[rule]]
+n = "D4.12"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 401
+
+[[rule]]
+n = "D4.13"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "D4.14"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 20
+
+[[rule]]
+n = "D4.15"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+# --- Rule 1: A standard C environment --------------------------------------
+[[rule]]
+n = "1.1"
+o = "required"
+d = "decidable"
+s = "system"
+c = "external"
+
+[[rule]]
+n = "1.2"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "1.3"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 758
+
+[[rule]]
+n = "1.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "1.5"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+# --- Rule 2: Unused code ---------------------------------------------------
+[[rule]]
+n = "2.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 561
+
+[[rule]]
+n = "2.2"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 561
+
+[[rule]]
+n = "2.3"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "2.4"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "2.5"
+o = "advisory"
+d = "decidable"
+s = "system"
+# `partial`, not `native`: a macro is judged against the file that defines it,
+# and a header's macros are not judged at all, because another translation
+# unit may use them. Nothing looks across the project for one that none does,
+# so a clean 2.5 result is not evidence of conformance.
+c = "partial"
+
+[[rule]]
+n = "2.6"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "2.7"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "2.8"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+# --- Rule 3: Comments ------------------------------------------------------
+[[rule]]
+n = "3.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "3.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 4: Character sets and lexical conventions ------------------------
+[[rule]]
+n = "4.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "4.2"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 5: Identifiers ---------------------------------------------------
+[[rule]]
+n = "5.1"
+o = "required"
+d = "decidable"
+s = "system"
+# `partial`, not `native`: significant length is the *linker's*, so the case that
+# matters is a collision between translation units — and the check runs over the
+# functions of one file, as its own doc comment says. Demonstrated by
+# `system_scope_needs_the_whole_program.rs`.
+c = "partial"
+
+[[rule]]
+n = "5.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "5.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "5.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "5.5"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "5.6"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "5.7"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "5.8"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "5.9"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+# --- Rule 6: Types ---------------------------------------------------------
+[[rule]]
+n = "6.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "6.2"
+o = "required"
+d = "decidable"
+s = "single"
+# `partial`, not `native`: the engine reads the signedness from the keywords
+# written in the declaration, and does not resolve typedefs, so
+# `int32_t flag : 1` passes. A clean 6.2 result is not evidence of conformance.
+c = "partial"
+
+[[rule]]
+n = "6.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 7: Literals and constants ----------------------------------------
+[[rule]]
+n = "7.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "7.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "7.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "7.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 843
+
+[[rule]]
+n = "7.5"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "7.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 8: Declarations and definitions ----------------------------------
+[[rule]]
+n = "8.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "8.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "8.3"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.4"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.5"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.6"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.7"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.8"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.9"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.10"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "8.11"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "8.12"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "8.13"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.14"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "8.15"
+o = "required"
+d = "decidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "8.16"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "8.17"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 9: Initialization ------------------------------------------------
+[[rule]]
+n = "9.1"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 457
+
+[[rule]]
+n = "9.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "9.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "9.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "9.5"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "9.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "9.7"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+# --- Rule 10: The essential type model -------------------------------------
+[[rule]]
+n = "10.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 197
+
+[[rule]]
+n = "10.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.5"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "10.8"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 11: Pointer type conversions -------------------------------------
+[[rule]]
+n = "11.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 704
+
+[[rule]]
+n = "11.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "11.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 843
+
+[[rule]]
+n = "11.4"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 587
+
+[[rule]]
+n = "11.5"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "11.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "11.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "11.8"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 704
+
+[[rule]]
+n = "11.9"
+o = "required"
+d = "decidable"
+s = "single"
+# `partial`, not `native`: the engine reports `(void *)0` and a pointer
+# declarator initialised with `0`. Assigning, comparing, passing or returning
+# a bare `0` as a pointer needs the operand's type, which it does not have, so
+# `if (p == 0)` passes. A clean 11.9 result is not evidence of conformance.
+c = "partial"
+
+[[rule]]
+n = "11.10"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 12: Expressions --------------------------------------------------
+[[rule]]
+n = "12.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+# `partial`, not `native`: the guideline is open-ended -- every pair of
+# operators of differing precedence is in scope -- and the engine checks three
+# traps (`&&` with `||`, a shift with `+`/`-`, an unparenthesized `sizeof`
+# operand). A clean 12.1 result is not evidence of conformance, and saying
+# `native` claimed that it was.
+c = "partial"
+
+[[rule]]
+n = "12.2"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 682
+
+[[rule]]
+n = "12.3"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "12.4"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 190
+
+[[rule]]
+n = "12.5"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "12.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 13: Side effects -------------------------------------------------
+[[rule]]
+n = "13.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "13.2"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+cwe = 758
+
+[[rule]]
+n = "13.3"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "13.4"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "13.5"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "13.6"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 14: Control statement expressions --------------------------------
+[[rule]]
+n = "14.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "14.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "partial"
+
+[[rule]]
+n = "14.3"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "partial"
+cwe = 570
+
+[[rule]]
+n = "14.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 15: Control flow -------------------------------------------------
+[[rule]]
+n = "15.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "15.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "15.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "15.4"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "15.5"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "15.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 483
+
+[[rule]]
+n = "15.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 16: Switch statements --------------------------------------------
+[[rule]]
+n = "16.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "partial"
+
+[[rule]]
+n = "16.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "16.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 484
+
+[[rule]]
+n = "16.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 478
+
+[[rule]]
+n = "16.5"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "16.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "16.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 17: Functions ----------------------------------------------------
+[[rule]]
+n = "17.1"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "17.2"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "partial"
+cwe = 674
+
+[[rule]]
+n = "17.3"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "external"
+
+[[rule]]
+n = "17.4"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "17.5"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 129
+
+[[rule]]
+n = "17.6"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "17.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 252
+
+[[rule]]
+n = "17.8"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "17.9"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "17.10"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "17.11"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "17.12"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "17.13"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 18: Pointers and arrays ------------------------------------------
+[[rule]]
+n = "18.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 787
+
+[[rule]]
+n = "18.2"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 469
+
+[[rule]]
+n = "18.3"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "18.4"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "18.5"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "18.6"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 562
+
+[[rule]]
+n = "18.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "18.8"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 789
+
+[[rule]]
+n = "18.9"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "18.10"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 19: Overlapping storage ------------------------------------------
+[[rule]]
+n = "19.1"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 475
+
+[[rule]]
+n = "19.2"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 20: Preprocessing directives -------------------------------------
+[[rule]]
+n = "20.1"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.2"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.5"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "20.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.8"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "20.9"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "20.10"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.11"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.12"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "20.13"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "20.14"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+# --- Rule 21: Standard libraries -------------------------------------------
+[[rule]]
+n = "21.1"
+o = "required"
+d = "decidable"
+s = "single"
+# `partial`, not `native`: the engine knows the reserved prefixes (`__`, `_X`)
+# and nine standard names, not every macro and identifier the standard library
+# declares, so `#define INT_MAX 100` passes. A clean 21.1 result is not
+# evidence of conformance.
+c = "partial"
+
+[[rule]]
+n = "21.2"
+o = "required"
+d = "decidable"
+s = "system"
+c = "partial"
+
+[[rule]]
+n = "21.3"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 401
+
+[[rule]]
+n = "21.4"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.5"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.6"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.7"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 20
+
+[[rule]]
+n = "21.8"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.9"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.10"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.11"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.12"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "21.13"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 704
+
+[[rule]]
+n = "21.14"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "21.15"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "21.16"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "21.17"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 787
+
+[[rule]]
+n = "21.18"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 787
+
+[[rule]]
+n = "21.19"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "21.20"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 416
+
+[[rule]]
+n = "21.21"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 78
+
+[[rule]]
+n = "21.22"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "21.23"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "21.24"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 338
+
+[[rule]]
+n = "21.25"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 366
+
+[[rule]]
+n = "21.26"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Rule 22: Resources ----------------------------------------------------
+[[rule]]
+n = "22.1"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 772
+
+[[rule]]
+n = "22.2"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 590
+
+[[rule]]
+n = "22.3"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.4"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.5"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "22.6"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 416
+
+[[rule]]
+n = "22.7"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "22.8"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.9"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.10"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.11"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.12"
+o = "mandatory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+[[rule]]
+n = "22.13"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "22.14"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 665
+
+[[rule]]
+n = "22.15"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.16"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 667
+
+[[rule]]
+n = "22.17"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 667
+
+[[rule]]
+n = "22.18"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 833
+
+[[rule]]
+n = "22.19"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+
+[[rule]]
+n = "22.20"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 665

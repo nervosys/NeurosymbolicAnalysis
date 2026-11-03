@@ -1,0 +1,23 @@
+{
+  "bundle": {
+    "externalBin": [
+      "binaries/sda"
+    ],
+    "resources": {
+      "binaries/THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt",
+      "../../LICENSE": "LICENSE"
+    },
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer-hooks.nsh"
+      }
+    },
+    "linux": {
+      "deb": {
+        "files": {
+          "/usr/share/doc/statodynamic-analysis/copyright": "../../LICENSE"
+        }
+      }
+    }
+  }
+}

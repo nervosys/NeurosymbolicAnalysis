@@ -1,0 +1,1412 @@
+{
+ "clang": "clang version 22.1.8 (https://github.com/llvm/llvm-project ca7933e47d3a3451d81e72ac174dcb5aa28b59d1)",
+ "cases": [
+  {
+   "name": "declarations",
+   "dialect": "c",
+   "text": "int main(void) {\n    int x = 0x1f;  /* c */\n    return x; // done\n}\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "main",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_paren",
+     "text": "(",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "void",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_paren",
+     "text": ")",
+     "line": 1,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_brace",
+     "text": "{",
+     "line": 1,
+     "column": 16,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 2,
+     "column": 5,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "x",
+     "line": 2,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "0x1f",
+     "line": 2,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 17,
+     "startOfLine": false
+    },
+    {
+     "kind": "comment",
+     "text": "/* c */",
+     "line": 2,
+     "column": 20,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "return",
+     "line": 3,
+     "column": 5,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "x",
+     "line": 3,
+     "column": 12,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 3,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "comment",
+     "text": "// done",
+     "line": 3,
+     "column": 15,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_brace",
+     "text": "}",
+     "line": 4,
+     "column": 1,
+     "startOfLine": true
+    }
+   ]
+  },
+  {
+   "name": "numbers",
+   "dialect": "c",
+   "text": "int a[] = { 42, 0x1p-3, 1.5e+10f, 0b1011, 077, 0xAULL, .5f };\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_square",
+     "text": "[",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_square",
+     "text": "]",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_brace",
+     "text": "{",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "42",
+     "line": 1,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 15,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "0x1p-3",
+     "line": 1,
+     "column": 17,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 23,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1.5e+10f",
+     "line": 1,
+     "column": 25,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 33,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "0b1011",
+     "line": 1,
+     "column": 35,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 41,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "077",
+     "line": 1,
+     "column": 43,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 46,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "0xAULL",
+     "line": 1,
+     "column": 48,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 1,
+     "column": 54,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": ".5f",
+     "line": 1,
+     "column": 56,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_brace",
+     "text": "}",
+     "line": 1,
+     "column": 60,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 61,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "digit-separators",
+   "dialect": "cpp",
+   "text": "auto n = 1'000'000;\nauto h = 0xFF'FF;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "n",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1'000'000",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 19,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "h",
+     "line": 2,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "0xFF'FF",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 17,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "strings-and-chars",
+   "dialect": "c",
+   "text": "char *s = \"a\\\"b\\\\\";\nchar c = '\\n';\nchar o = '\\101';\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "char",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "star",
+     "text": "*",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "s",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "string_literal",
+     "text": "\"a\\\"b\\\\\"",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 19,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "char",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "c",
+     "line": 2,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "char_constant",
+     "text": "'\\n'",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "char",
+     "line": 3,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "o",
+     "line": 3,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 3,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "char_constant",
+     "text": "'\\101'",
+     "line": 3,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 3,
+     "column": 16,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "wide-prefixes",
+   "dialect": "cpp",
+   "text": "auto a = L\"wide\";\nauto b = u8\"utf8\";\nauto c = U'x';\nauto d = u\"u16\";\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "wide_string_literal",
+     "text": "L\"wide\"",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 17,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "b",
+     "line": 2,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "utf8_string_literal",
+     "text": "u8\"utf8\"",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 18,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 3,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "c",
+     "line": 3,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 3,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "utf32_char_constant",
+     "text": "U'x'",
+     "line": 3,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 3,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 4,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "d",
+     "line": 4,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 4,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "utf16_string_literal",
+     "text": "u\"u16\"",
+     "line": 4,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 4,
+     "column": 16,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "raw-string",
+   "dialect": "cpp",
+   "text": "auto r = R\"delim(no \\escape \"here\")delim\";\nint after = 1;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "auto",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "r",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "string_literal",
+     "text": "R\"delim(no \\escape \"here\")delim\"",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 42,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "after",
+     "line": 2,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1",
+     "line": 2,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 14,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "maximal-munch",
+   "dialect": "cpp",
+   "text": "int x = a<::b;\nint y = i+++j;\nint z = a->*b;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "x",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "less",
+     "text": "<",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "coloncolon",
+     "text": "::",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "b",
+     "line": 1,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "y",
+     "line": 2,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "i",
+     "line": 2,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "plusplus",
+     "text": "++",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "plus",
+     "text": "+",
+     "line": 2,
+     "column": 12,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "j",
+     "line": 2,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 3,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "z",
+     "line": 3,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 3,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 3,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "arrowstar",
+     "text": "->*",
+     "line": 3,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "b",
+     "line": 3,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 3,
+     "column": 14,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "operators",
+   "dialect": "c",
+   "text": "int v = a << 2 >>= b != c;\nint w = p->q, r = s ? t : u;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "v",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "lessless",
+     "text": "<<",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "2",
+     "line": 1,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "greatergreaterequal",
+     "text": ">>=",
+     "line": 1,
+     "column": 16,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "b",
+     "line": 1,
+     "column": 20,
+     "startOfLine": false
+    },
+    {
+     "kind": "exclaimequal",
+     "text": "!=",
+     "line": 1,
+     "column": 22,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "c",
+     "line": 1,
+     "column": 25,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 26,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "w",
+     "line": 2,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "p",
+     "line": 2,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "arrow",
+     "text": "->",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "q",
+     "line": 2,
+     "column": 12,
+     "startOfLine": false
+    },
+    {
+     "kind": "comma",
+     "text": ",",
+     "line": 2,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "r",
+     "line": 2,
+     "column": 15,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 17,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "s",
+     "line": 2,
+     "column": 19,
+     "startOfLine": false
+    },
+    {
+     "kind": "question",
+     "text": "?",
+     "line": 2,
+     "column": 21,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "t",
+     "line": 2,
+     "column": 23,
+     "startOfLine": false
+    },
+    {
+     "kind": "colon",
+     "text": ":",
+     "line": 2,
+     "column": 25,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "u",
+     "line": 2,
+     "column": 27,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 28,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "line-continuation",
+   "dialect": "c",
+   "text": "int spl\\\nit = 1;\n// comment cont\\\ninued\nint after = 2;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "split",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 4,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1",
+     "line": 2,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 5,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "after",
+     "line": 5,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 5,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "2",
+     "line": 5,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 5,
+     "column": 14,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "tabs-and-columns",
+   "dialect": "c",
+   "text": "\tint\tx\t=\t1;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 2,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "x",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 8,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "utf8-comment",
+   "dialect": "c",
+   "text": "/* café naïve */\nint x = 1;\n",
+   "tokens": [
+    {
+     "kind": "comment",
+     "text": "/* café naïve */",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 2,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "x",
+     "line": 2,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 2,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1",
+     "line": 2,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 2,
+     "column": 10,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "block-comment-across-lines",
+   "dialect": "c",
+   "text": "int a = 1; /* one\n two\n three */ int b = 2;\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "a",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "1",
+     "line": 1,
+     "column": 9,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "comment",
+     "text": "/* one\n two\n three */",
+     "line": 1,
+     "column": 12,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 3,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "b",
+     "line": 3,
+     "column": 15,
+     "startOfLine": false
+    },
+    {
+     "kind": "equal",
+     "text": "=",
+     "line": 3,
+     "column": 17,
+     "startOfLine": false
+    },
+    {
+     "kind": "numeric_constant",
+     "text": "2",
+     "line": 3,
+     "column": 19,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 3,
+     "column": 20,
+     "startOfLine": false
+    }
+   ]
+  },
+  {
+   "name": "punct-run",
+   "dialect": "c",
+   "text": "int f(int*p){return*p;}\n",
+   "tokens": [
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 1,
+     "startOfLine": true
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "f",
+     "line": 1,
+     "column": 5,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_paren",
+     "text": "(",
+     "line": 1,
+     "column": 6,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "int",
+     "line": 1,
+     "column": 7,
+     "startOfLine": false
+    },
+    {
+     "kind": "star",
+     "text": "*",
+     "line": 1,
+     "column": 10,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "p",
+     "line": 1,
+     "column": 11,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_paren",
+     "text": ")",
+     "line": 1,
+     "column": 12,
+     "startOfLine": false
+    },
+    {
+     "kind": "l_brace",
+     "text": "{",
+     "line": 1,
+     "column": 13,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "return",
+     "line": 1,
+     "column": 14,
+     "startOfLine": false
+    },
+    {
+     "kind": "star",
+     "text": "*",
+     "line": 1,
+     "column": 20,
+     "startOfLine": false
+    },
+    {
+     "kind": "raw_identifier",
+     "text": "p",
+     "line": 1,
+     "column": 21,
+     "startOfLine": false
+    },
+    {
+     "kind": "semi",
+     "text": ";",
+     "line": 1,
+     "column": 22,
+     "startOfLine": false
+    },
+    {
+     "kind": "r_brace",
+     "text": "}",
+     "line": 1,
+     "column": 23,
+     "startOfLine": false
+    }
+   ]
+  }
+ ]
+}

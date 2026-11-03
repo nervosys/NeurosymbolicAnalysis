@@ -1,0 +1,41 @@
+{
+ "clippy": "clippy 0.1.98 (48a229ceae 2026-09-01)",
+ "crate_dir": "tools/rust-panic-corpus",
+ "sites": [
+  {
+   "line": 9,
+   "guideline": "PANIC.1",
+   "lint": "clippy::unwrap_used"
+  },
+  {
+   "line": 10,
+   "guideline": "PANIC.1",
+   "lint": "clippy::expect_used"
+  },
+  {
+   "line": 17,
+   "guideline": "PANIC.2",
+   "lint": "clippy::panic"
+  },
+  {
+   "line": 20,
+   "guideline": "PANIC.2",
+   "lint": "clippy::unreachable"
+  },
+  {
+   "line": 23,
+   "guideline": "PANIC.2",
+   "lint": "clippy::todo"
+  },
+  {
+   "line": 26,
+   "guideline": "PANIC.2",
+   "lint": "clippy::unimplemented"
+  },
+  {
+   "line": 55,
+   "guideline": "PANIC.1",
+   "lint": "clippy::unwrap_used"
+  }
+ ]
+}

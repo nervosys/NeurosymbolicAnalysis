@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-check-buffer"
+description = "Enables the check_buffer command without any pre-configured scope."
+commands.allow = ["check_buffer"]
+
+[[permission]]
+identifier = "deny-check-buffer"
+description = "Denies the check_buffer command without any pre-configured scope."
+commands.deny = ["check_buffer"]

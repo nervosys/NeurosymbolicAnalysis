@@ -1,0 +1,3 @@
+# A Windows checkout with core.autocrlf would otherwise hand these to WSL as CRLF,
+# and sh stops at `set -eu` with an illegal option.
+*.sh text eol=lf

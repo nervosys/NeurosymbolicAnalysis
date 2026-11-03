@@ -1,0 +1,317 @@
+# The NERVOSYS Rust 2024 safety profile.
+#
+# Unlike MISRA, this is not a licensed external standard — it is defined here, in
+# full, and is therefore complete by construction. It exists because Rust's
+# guarantees have a boundary, and safety-critical and embedded work lives right
+# on it: `unsafe`, FFI, panics in code that must not abort, and the edition-2024
+# migration hazards.
+#
+# Rules are deliberately *not* a restatement of clippy. Where clippy already
+# covers something well, the entry's coverage is `external` and the clippy
+# adapter reports it. Native rules cover what clippy does not: justification
+# discipline, firmware-specific prohibitions, and AI-model-artifact handling.
+
+standard = "Rust 2024"
+language = "rust"
+completeness = "complete"
+
+# --- Unsafe code -----------------------------------------------------------
+# CWE-758 is "Reliance on Undefined, Unspecified, or Implementation-Defined
+# Behavior" (checked against cwe.mitre.org/data/definitions/758.html), which is
+# what an `unsafe` block is: the compiler has stopped checking, and the
+# justification is the only remaining evidence that the assumed properties hold.
+#
+# This said `cwe = 1108`, which is "Excessive Reliance on Global Variables"
+# (cwe.mitre.org/data/definitions/1108.html) — unrelated to this rule. It was not
+# only wrong on its face: `same_defect_class` matches a runtime witness against
+# the static finding's CWE, and 1108 is in no runtime event's related set, so a
+# sanitizer or interpreter reporting undefined behaviour inside an unjustified
+# `unsafe` block could never confirm this finding. Miri did exactly that and the
+# two claims about one block were reported as unrelated.
+[[rule]]
+n = "UNSAFE.1"
+t = "Every unsafe block shall carry a SAFETY comment justifying its preconditions"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 758
+
+[[rule]]
+n = "UNSAFE.2"
+t = "An unsafe function shall document its safety contract for callers"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "UNSAFE.3"
+t = "A crate with no need for unsafe code shall declare #![forbid(unsafe_code)]"
+o = "advisory"
+d = "decidable"
+s = "system"
+c = "native"
+
+[[rule]]
+n = "UNSAFE.4"
+t = "static mut shall not be used; references to it are a hard error in edition 2024"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 362
+
+[[rule]]
+n = "UNSAFE.5"
+t = "std::mem::transmute shall not be used where a checked conversion exists"
+o = "required"
+d = "decidable"
+s = "single"
+c = "external"
+cwe = 704
+
+[[rule]]
+n = "UNSAFE.6"
+t = "The unsafe block shall be no larger than the operation that requires it"
+o = "advisory"
+d = "decidable"
+s = "single"
+c = "semantics"
+
+# --- Panics and aborts -----------------------------------------------------
+[[rule]]
+n = "PANIC.1"
+t = "unwrap and expect shall not be used outside tests in a no_std or safety-critical crate"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 248
+
+[[rule]]
+n = "PANIC.2"
+t = "panic! unreachable! todo! unimplemented! and the assert family shall not appear in shipped code paths"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 248
+
+[[rule]]
+n = "PANIC.3"
+t = "Slice indexing that can panic should be replaced by get with explicit handling"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "external"
+cwe = 125
+
+[[rule]]
+n = "PANIC.4"
+t = "Integer arithmetic that can overflow shall use checked, saturating, or wrapping forms explicitly"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "external"
+cwe = 190
+
+# --- FFI boundaries --------------------------------------------------------
+[[rule]]
+n = "FFI.1"
+t = "Every extern function declaration shall document the invariants the foreign side must uphold"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "FFI.2"
+t = "Types crossing an FFI boundary shall be #[repr(C)] or a primitive with a defined layout"
+o = "required"
+d = "decidable"
+s = "single"
+c = "semantics"
+cwe = 704
+
+[[rule]]
+n = "FFI.3"
+t = "A raw pointer received across an FFI boundary shall be null-checked before dereference"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 476
+
+# --- Edition 2024 migration ------------------------------------------------
+[[rule]]
+n = "ED2024.1"
+t = "gen is a keyword in edition 2024 and shall not be used as an identifier"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "ED2024.2"
+t = "RPIT lifetime capture changed in edition 2024; impl Trait returns shall state their captures explicitly where it matters"
+o = "advisory"
+d = "undecidable"
+s = "system"
+c = "external"
+
+[[rule]]
+n = "ED2024.3"
+t = "unsafe extern blocks are required in edition 2024; bare extern blocks shall be migrated"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "ED2024.4"
+t = "Unsafe attributes (no_mangle, export_name, link_section) shall be written in their unsafe() form"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+
+[[rule]]
+n = "ED2024.5"
+t = "The edition shall be declared explicitly as 2024 in Cargo.toml"
+o = "required"
+d = "decidable"
+s = "system"
+c = "native"
+
+# --- Dependencies and supply chain -----------------------------------------
+[[rule]]
+n = "DEP.1"
+t = "Dependencies shall have no known advisories in the RustSec database"
+o = "required"
+d = "decidable"
+s = "system"
+c = "external"
+cwe = 1395
+
+[[rule]]
+n = "DEP.2"
+t = "Build scripts and procedural macros shall be reviewed; they execute arbitrary code at build time"
+o = "required"
+d = "decidable"
+s = "system"
+c = "native"
+cwe = 1357
+
+[[rule]]
+n = "DEP.3"
+t = "Dependencies shall be pinned by an exact version and a checked-in lockfile"
+o = "required"
+d = "decidable"
+s = "system"
+c = "native"
+cwe = 1104
+
+# --- Concurrency -----------------------------------------------------------
+[[rule]]
+n = "CONC.1"
+t = "An unsafe impl of Send or Sync shall carry a justification comment"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"
+cwe = 362
+
+[[rule]]
+n = "CONC.2"
+t = "A lock shall not be held across an await point"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "external"
+cwe = 833
+
+[[rule]]
+n = "CONC.3"
+t = "Data races shall be absent under concurrent execution"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 362
+
+# --- Embedded and firmware -------------------------------------------------
+[[rule]]
+n = "EMB.1"
+t = "Heap allocation shall not be used in a no_std crate without an explicitly reviewed allocator"
+o = "required"
+d = "decidable"
+s = "system"
+c = "native"
+cwe = 401
+
+[[rule]]
+n = "EMB.2"
+t = "Blocking operations shall not appear in an interrupt handler"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+
+[[rule]]
+n = "EMB.3"
+t = "Recursion shall not be used where stack depth cannot be bounded"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "semantics"
+cwe = 674
+
+# --- Embedded AI model handling --------------------------------------------
+# These are the Rust-side counterparts of the checks in `sda-ai`, and exist
+# because a local model embedded in firmware is an untrusted input with a
+# deserializer attached.
+[[rule]]
+n = "MODEL.1"
+t = "A model artifact embedded with include_bytes! shall have its digest verified at build time"
+o = "required"
+d = "decidable"
+s = "system"
+c = "native"
+cwe = 494
+
+[[rule]]
+n = "MODEL.2"
+t = "A model loaded from a filesystem or network path shall have its signature verified before use"
+o = "mandatory"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 494
+
+[[rule]]
+n = "MODEL.3"
+t = "Model deserialization shall not use a format capable of executing code, such as Python pickle"
+o = "mandatory"
+d = "decidable"
+s = "system"
+c = "native"
+cwe = 502
+
+[[rule]]
+n = "MODEL.4"
+t = "Inference input and output buffers shall be bounded by a compile-time-known maximum"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 787
+
+[[rule]]
+n = "MODEL.5"
+t = "A memory-mapped model file shall be treated as untrusted; header fields shall be validated before use"
+o = "required"
+d = "undecidable"
+s = "system"
+c = "dynamic"
+cwe = 1284

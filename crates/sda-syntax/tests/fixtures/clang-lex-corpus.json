@@ -1,0 +1,67 @@
+[
+ {
+  "name": "declarations",
+  "dialect": "c",
+  "text": "int main(void) {\n    int x = 0x1f;  /* c */\n    return x; // done\n}\n"
+ },
+ {
+  "name": "numbers",
+  "dialect": "c",
+  "text": "int a[] = { 42, 0x1p-3, 1.5e+10f, 0b1011, 077, 0xAULL, .5f };\n"
+ },
+ {
+  "name": "digit-separators",
+  "dialect": "cpp",
+  "text": "auto n = 1'000'000;\nauto h = 0xFF'FF;\n"
+ },
+ {
+  "name": "strings-and-chars",
+  "dialect": "c",
+  "text": "char *s = \"a\\\"b\\\\\";\nchar c = '\\n';\nchar o = '\\101';\n"
+ },
+ {
+  "name": "wide-prefixes",
+  "dialect": "cpp",
+  "text": "auto a = L\"wide\";\nauto b = u8\"utf8\";\nauto c = U'x';\nauto d = u\"u16\";\n"
+ },
+ {
+  "name": "raw-string",
+  "dialect": "cpp",
+  "text": "auto r = R\"delim(no \\escape \"here\")delim\";\nint after = 1;\n"
+ },
+ {
+  "name": "maximal-munch",
+  "dialect": "cpp",
+  "text": "int x = a<::b;\nint y = i+++j;\nint z = a->*b;\n"
+ },
+ {
+  "name": "operators",
+  "dialect": "c",
+  "text": "int v = a << 2 >>= b != c;\nint w = p->q, r = s ? t : u;\n"
+ },
+ {
+  "name": "line-continuation",
+  "dialect": "c",
+  "text": "int spl\\\nit = 1;\n// comment cont\\\ninued\nint after = 2;\n"
+ },
+ {
+  "name": "tabs-and-columns",
+  "dialect": "c",
+  "text": "\tint\tx\t=\t1;\n"
+ },
+ {
+  "name": "utf8-comment",
+  "dialect": "c",
+  "text": "/* café naïve */\nint x = 1;\n"
+ },
+ {
+  "name": "block-comment-across-lines",
+  "dialect": "c",
+  "text": "int a = 1; /* one\n two\n three */ int b = 2;\n"
+ },
+ {
+  "name": "punct-run",
+  "dialect": "c",
+  "text": "int f(int*p){return*p;}\n"
+ }
+]

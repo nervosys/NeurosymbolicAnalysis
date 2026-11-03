@@ -1,0 +1,82 @@
+{
+ "version": "2.1.0",
+ "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json",
+ "runs": [
+  {
+   "invocations": [
+    {
+     "executionSuccessful": true,
+     "toolExecutionNotifications": []
+    }
+   ],
+   "results": [
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "requires login"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "src\\app.py",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 35,
+         "endLine": 4,
+         "snippet": {
+          "text": "    subprocess.run(cmd, shell=True)"
+         },
+         "startColumn": 31,
+         "startLine": 4
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "Found 'subprocess' function 'run' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead."
+     },
+     "properties": {},
+     "ruleId": "python.lang.security.audit.subprocess-shell-true.subprocess-shell-true"
+    }
+   ],
+   "tool": {
+    "driver": {
+     "name": "Semgrep OSS",
+     "semanticVersion": "1.172.0",
+     "rules": [
+      {
+       "defaultConfiguration": {
+        "level": "error"
+       },
+       "fullDescription": {
+        "text": "Found 'subprocess' function '$FUNC' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead."
+       },
+       "help": {
+        "markdown": "Found 'subprocess' function '$FUNC' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead.\n\n#### 💎 Enable cross-file analysis and Pro rules for free at <a href='https://sg.run/pro'>sg.run/pro</a>\n\n<b>References:</b>\n - [Semgrep Rule](https://semgrep.dev/r/python.lang.security.audit.subprocess-shell-true.subprocess-shell-true)\n - [https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess](https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess)\n - [https://docs.python.org/3/library/subprocess.html](https://docs.python.org/3/library/subprocess.html)\n",
+        "text": "Found 'subprocess' function '$FUNC' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead.\n💎 Enable cross-file analysis and Pro rules for free at sg.run/pro"
+       },
+       "helpUri": "https://semgrep.dev/r/python.lang.security.audit.subprocess-shell-true.subprocess-shell-true",
+       "id": "python.lang.security.audit.subprocess-shell-true.subprocess-shell-true",
+       "name": "python.lang.security.audit.subprocess-shell-true.subprocess-shell-true",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+         "MEDIUM CONFIDENCE",
+         "OWASP-A01:2017 - Injection",
+         "OWASP-A03:2021 - Injection",
+         "OWASP-A05:2025 - Injection",
+         "security"
+        ]
+       },
+       "shortDescription": {
+        "text": "Semgrep Finding: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true"
+       }
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

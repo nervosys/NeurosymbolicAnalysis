@@ -1,0 +1,19 @@
+[package]
+name = "sda-editor"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "A Rust-native port of Monaco's text model: rope buffer, versioned edits, cursors, decorations and diagnostic overlay"
+
+[dependencies]
+sda-core.workspace = true
+sda-syntax.workspace = true
+serde.workspace = true
+ropey.workspace = true
+
+[dev-dependencies]
+# Only to read the captured Monaco answers in `agrees_with_monaco.rs`.
+serde_json.workspace = true

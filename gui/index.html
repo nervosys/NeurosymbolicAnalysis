@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>StatodynamicAnalysis</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <span class="brand">StatodynamicAnalysis</span>
+      <input id="root" placeholder="project root" value="." aria-label="Project root" />
+      <input id="artifact" placeholder="built artifact (enables dynamic analysis)" aria-label="Built artifact" />
+      <label class="check" title="Runs installed tools such as cppcheck, clang-tidy and cargo clippy in the project. Building a Rust project runs its build scripts and macros: enable this only for code you trust."><input type="checkbox" id="external" /> external tools (runs project build code)</label>
+      <button id="scan">Scan</button>
+      <button id="plan" class="ghost">Plan</button>
+      <div id="progress" class="progress" hidden><span></span></div>
+      <span id="count" aria-live="polite"></span>
+    </header>
+
+    <!-- Not dismissible on purpose: what a run did not check is part of the result. -->
+    <div id="not-checked" class="banner"></div>
+
+    <!-- The review queue, not a search box. Every control here narrows a *view*;
+         none of it is written to a report, and none of it can hide a finding from
+         the counts in the header. -->
+    <div id="filters" role="toolbar" aria-label="Filter findings">
+      <input id="q" type="search" placeholder="Filter…  (/)" aria-label="Filter text" />
+      <div class="chips" id="chips-verdict" aria-label="Verdict"></div>
+      <div class="chips" id="chips-sev" aria-label="Severity"></div>
+      <div class="chips" id="chips-triage" aria-label="Review state"></div>
+      <div class="chips" id="chips-new" aria-label="New since baseline"></div>
+      <div class="chips" id="chips-mine" aria-label="Assigned to me"></div>
+      <select id="groupby" aria-label="Group by">
+        <option value="none">no grouping</option>
+        <option value="file">group by file</option>
+        <option value="rule">group by rule</option>
+        <option value="verdict">group by verdict</option>
+      </select>
+      <span id="shown" class="muted"></span>
+      <button id="clear" class="ghost small">Reset</button>
+      <span id="baseline-info" class="muted"></span>
+      <button id="set-baseline" class="ghost small">Set baseline</button>
+    </div>
+
+    <main>
+      <aside id="findings" role="listbox" tabindex="0" aria-label="Findings"></aside>
+      <div class="split" id="split-list" role="separator" aria-orientation="vertical"></div>
+
+      <section id="panes">
+        <div id="editor"></div>
+        <div class="split horizontal" id="split-term" role="separator" aria-orientation="horizontal"></div>
+        <div id="terminal"></div>
+      </section>
+
+      <div class="split" id="split-detail" role="separator" aria-orientation="vertical"></div>
+      <aside id="detail" aria-label="Finding detail"></aside>
+    </main>
+
+    <footer id="status">loading…</footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

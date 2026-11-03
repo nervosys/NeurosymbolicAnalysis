@@ -1,0 +1,19 @@
+[package]
+name = "sda-syntax"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Native C23 / C++23 / Rust 2024 lexers and structural models — no external compiler frontend required"
+
+[dependencies]
+serde.workspace = true
+
+[dev-dependencies]
+proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
+ra-ap-rustc_lexer = "0.174"
+# Only to read the captured clang answers in `agrees_with_clang.rs`.
+serde_json.workspace = true
+syn = { version = "3.0.5", features = ["full", "extra-traits", "visit"] }

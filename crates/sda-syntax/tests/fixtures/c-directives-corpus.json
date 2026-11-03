@@ -1,0 +1,57 @@
+[
+ {
+  "name": "simple-define",
+  "dialect": "c",
+  "text": "#define A 1\nint x = A;\n"
+ },
+ {
+  "name": "continued-define",
+  "dialect": "c",
+  "text": "#define MAX(a,b) \\\n    ((a) > (b) ? (a) : (b))\nint y = 0;\n"
+ },
+ {
+  "name": "two-continuations",
+  "dialect": "c",
+  "text": "#define LONG(a) \\\n    a + \\\n    1\nint z = 0;\n"
+ },
+ {
+  "name": "include-and-code",
+  "dialect": "c",
+  "text": "#include <stdio.h>\nint w = 1;\n"
+ },
+ {
+  "name": "include-guard",
+  "dialect": "c",
+  "text": "#ifndef GUARD_H\n#define GUARD_H\nint g;\n#endif\n"
+ },
+ {
+  "name": "nested-conditionals",
+  "dialect": "c",
+  "text": "#if A\n#  if B\nint a;\n#  endif\n#endif\n"
+ },
+ {
+  "name": "spaced-hash",
+  "dialect": "c",
+  "text": "#  define SPACED 1\nint s = SPACED;\n"
+ },
+ {
+  "name": "directive-with-comment",
+  "dialect": "c",
+  "text": "#define C 1 /* why */\nint c = C;\n"
+ },
+ {
+  "name": "define-with-line-comment",
+  "dialect": "c",
+  "text": "#define D 1 // why\nint d = D;\n"
+ },
+ {
+  "name": "pragma",
+  "dialect": "c",
+  "text": "#pragma once\nint p = 1;\n"
+ },
+ {
+  "name": "continued-if",
+  "dialect": "c",
+  "text": "#if defined(A) && \\\n    defined(B)\nint q;\n#endif\n"
+ }
+]

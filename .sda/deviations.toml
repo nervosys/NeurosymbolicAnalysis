@@ -1,0 +1,92 @@
+# Deviation register for the StatodynamicAnalysis toolkit itself.
+#
+# Recorded against `sda scan crates`. Every entry here is a finding this toolkit
+# raised about its own source, examined and judged acceptable — which is the only
+# legitimate use of this file. Findings not listed below are still open work, and
+# deliberately left visible.
+
+# --- Panicking on malformed built-in data -----------------------------------
+# These four sites panic when a catalogue compiled into the binary with
+# include_str! fails to parse. The data is not input: it ships inside the
+# executable, and a test in each crate parses every built-in file, so a malformed
+# one cannot reach a release. Returning an error instead would push an
+# impossible case onto every caller.
+[[deviation]]
+rule = "RUST-2024-PANIC.2"
+scope = "file"
+path = "sda-rules/src/lib.rs"
+rationale = "panics only if a catalogue compiled into the binary is malformed; every built-in catalogue is parsed by a test, so this is unreachable in a shipped build"
+approver = "a.erickson"
+reference = "self-scan-2026-08"
+
+[[deviation]]
+rule = "RUST-2024-PANIC.2"
+scope = "file"
+path = "sda-ontology/src/lib.rs"
+rationale = "panics only if the built-in tool ontology is malformed; a test parses it, so this is unreachable in a shipped build"
+approver = "a.erickson"
+reference = "self-scan-2026-08"
+
+[[deviation]]
+rule = "RUST-2024-PANIC.2"
+scope = "file"
+path = "sda-ai/src/risk.rs"
+rationale = "panics only if the built-in LLM risk taxonomy or AI RMF index is malformed; both are parsed by tests, so this is unreachable in a shipped build"
+approver = "a.erickson"
+reference = "self-scan-2026-08"
+
+# --- The C probe shim -------------------------------------------------------
+# `shim/sda_probe.h` is instrumentation for MISRA-constrained targets, so it is
+# held to the same rules it helps enforce. Three depart deliberately.
+
+[[deviation]]
+rule = "MISRA-C-2023-21.6"
+scope = "file"
+path = "sda_probe.h"
+rationale = "the default sink uses <stdio.h> so the shim can be exercised on a host during development; a freestanding build must define SDA_PROBE_CUSTOM_SINK, which removes the dependency entirely, and the header says so above the implementation"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"
+
+[[deviation]]
+rule = "MISRA-C-2023-D4.9"
+scope = "file"
+path = "sda_probe.h"
+rationale = "SDA_COV and SDA_FAULT must be macros: they capture __FILE__ and __LINE__ at the call site, which a function cannot do, and that location is the entire content of a coverage record"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"
+
+[[deviation]]
+rule = "MISRA-C-2023-D4.6"
+scope = "file"
+path = "sda_probe.h"
+rationale = "uses plain `unsigned long` rather than a width-explicit typedef so the header compiles on toolchains that predate <stdint.h>; the shim must build wherever the target builds, including compilers older than the typedefs the rule prefers"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"
+
+# The remaining shim departures are Advisory and inherent to the form. Rule 13.3
+# is absent from this list on purpose: the `buf[at++] = c` idiom was rewritten
+# across 26 sites and the result recompiled and re-run, so there is nothing left
+# to waive.
+[[deviation]]
+rule = "MISRA-C-2023-20.1"
+scope = "file"
+path = "sda_probe.h"
+rationale = "a single-header library necessarily places its implementation includes after the declarations, since both live in one file; splitting them would defeat the point of the single-header form, which is what makes the shim droppable into a vendor build with no build-system change"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"
+
+[[deviation]]
+rule = "MISRA-C-2023-15.5"
+scope = "file"
+path = "sda_probe.h"
+rationale = "three helpers return early when the output buffer is full; a single exit would need a flag threaded through each loop, which is harder to review than the early return it replaces"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"
+
+[[deviation]]
+rule = "MISRA-C-2023-15.4"
+scope = "file"
+path = "sda_probe.h"
+rationale = "the escape loop breaks once on a full buffer, in addition to its normal termination; the alternative is a compound condition that hides the bound check"
+approver = "a.erickson"
+reference = "shim-scan-2026-08"

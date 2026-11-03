@@ -1,0 +1,33 @@
+# The declared analysis scope of this repository.
+#
+# A scope rule says *this rule does not apply, because this file is not part of
+# the product*. That is a different claim from a deviation, which says *this rule
+# is violated and we accept it*, and the two must not be collapsed — see the
+# module documentation in `crates/sda-rules/src/scope.rs`.
+#
+# ## Why `tools/` is scope and not deviations
+#
+# `sda scan tools` reported twenty findings, and every one of them was correct.
+# `tools/valgrind-wsl/three-sins/main.c` commits three memory-safety sins on
+# purpose — it is the program the captured `ext.valgrind` fixture was recorded
+# from — `vgwrap.c` calls `system()` by design because that is what a WSL shim
+# does, and `tools/codeql-taint-cpp/` exists to give CodeQL a command injection
+# to find. Until now that was prose in `HANDOFF.md`, which is to say a reader had
+# to be told.
+#
+# Deviations were the other candidate and are the wrong instrument here. Most of
+# the twenty are not deliberate sins at all: they are `D4.6` on a plain `int` and
+# `15.5` on a second `return`, in throwaway harness programs. A deviation for
+# those would have to be justified as "not delivered product", which is the scope
+# claim written in the wrong file — and twenty records against catalogued
+# guidelines would then travel in this project's conformance argument, which
+# describes the crates that ship.
+#
+# Nothing is hidden by this. Every rule below is reported in the *NOT CHECKED*
+# section of every run with the number of files it removed, and a rule that names
+# a directory which no longer exists says so.
+
+[[excluded]]
+path = "tools"
+reason = "developer harnesses and the deliberately-defective fixture sources tool output was captured from; none of it is delivered"
+approver = "a.erickson"

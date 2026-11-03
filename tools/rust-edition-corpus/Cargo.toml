@@ -1,0 +1,15 @@
+# Code that edition 2024 would refuse, kept at 2021 so a compiler will look at it.
+#
+# `static mut` references and bare `extern` blocks are hard errors in edition
+# 2024, so a 2024 crate containing them does not compile and rustc has no
+# diagnostics to offer — only a refusal. At 2021 they are lints, which is what
+# makes rustc usable as a second implementation for the ED2024 and UNSAFE rules.
+#
+# `[workspace]` is empty and present so the workspace above never builds this.
+[package]
+name = "rust-edition-corpus"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]

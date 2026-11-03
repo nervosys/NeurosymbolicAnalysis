@@ -1,0 +1,4 @@
+https://github.com/wravery/webview2-rs commit b74dc5e2b394044bea5191052868ce7a106c202c (no tag; the repository has no tags)
+Crates: webview2-com 0.38.2 and webview2-com-sys 0.38.2, licence MIT (Cargo.toml). Repository field: https://github.com/wravery/webview2-rs
+The commit is the one recorded in .cargo_vcs_info.json of the published crates.
+Fetched 2026-10-31 with curl from https://raw.githubusercontent.com/wravery/webview2-rs/b74dc5e2b394044bea5191052868ce7a106c202c/LICENSE

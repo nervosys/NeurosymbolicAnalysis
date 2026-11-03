@@ -1,0 +1,20 @@
+[package]
+name = "sda-agent"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The agentic layer: an MCP tool surface over the whole toolkit, a deterministic planner, and the autonomous build-diagnose-patch-verify loop"
+
+[dependencies]
+sda-core.workspace = true
+sda-ontology.workspace = true
+sda-rules.workspace = true
+sda-engine.workspace = true
+sda-adapters.workspace = true
+sda-build.workspace = true
+sda-ai.workspace = true
+serde.workspace = true
+serde_json.workspace = true

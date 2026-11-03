@@ -1,0 +1,3 @@
+https://github.com/jni-rs/jni-sys tag v0.4.1-macros
+Crate: jni-sys-macros 0.4.1, licence MIT OR Apache-2.0 (Cargo.toml). Repository field: https://github.com/jni-rs/jni-sys
+Fetched 2026-10-31 with curl from https://raw.githubusercontent.com/jni-rs/jni-sys/v0.4.1-macros/LICENSE-MIT and LICENSE-APACHE

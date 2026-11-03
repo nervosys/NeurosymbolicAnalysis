@@ -1,0 +1,103 @@
+{
+ "clang": "clang version 22.1.8 (https://github.com/llvm/llvm-project ca7933e47d3a3451d81e72ac174dcb5aa28b59d1)",
+ "cases": [
+  {
+   "name": "single-return",
+   "text": "int f(int a)\n{\n    return a;\n}\n",
+   "functions": {
+    "f": [
+     3
+    ]
+   }
+  },
+  {
+   "name": "two-returns",
+   "text": "int g(int a, int b)\n{\n    if (a > b) {\n        return a;\n    }\n    return b;\n}\n",
+   "functions": {
+    "g": [
+     4,
+     6
+    ]
+   }
+  },
+  {
+   "name": "no-return-void",
+   "text": "void h(void)\n{\n    int x = 1;\n    (void)x;\n}\n",
+   "functions": {
+    "h": []
+   }
+  },
+  {
+   "name": "early-returns",
+   "text": "int k(int n)\n{\n    if (n < 0) { return -1; }\n    if (n == 0) { return 0; }\n    while (n > 10) { n -= 10; }\n    return n;\n}\n",
+   "functions": {
+    "k": [
+     3,
+     4,
+     6
+    ]
+   }
+  },
+  {
+   "name": "return-in-switch",
+   "text": "int s(int n)\n{\n    switch (n) {\n    case 1: return 10;\n    case 2: return 20;\n    default: break;\n    }\n    return 0;\n}\n",
+   "functions": {
+    "s": [
+     4,
+     5,
+     8
+    ]
+   }
+  },
+  {
+   "name": "nested-function-like",
+   "text": "int outer(int a)\n{\n    int inner = a;\n    if (inner) {\n        if (inner > 1) {\n            return 2;\n        }\n        return 1;\n    }\n    return 0;\n}\n",
+   "functions": {
+    "outer": [
+     6,
+     8,
+     10
+    ]
+   }
+  },
+  {
+   "name": "return-with-comment",
+   "text": "int c(void)\n{\n    /* return 99; */\n    return 1; // return 98;\n}\n",
+   "functions": {
+    "c": [
+     4
+    ]
+   }
+  },
+  {
+   "name": "return-in-string",
+   "text": "int t(void)\n{\n    const char *s = \"return 5;\";\n    (void)s;\n    return 0;\n}\n",
+   "functions": {
+    "t": [
+     5
+    ]
+   }
+  },
+  {
+   "name": "two-functions",
+   "text": "int a1(void) { return 1; }\nint a2(void) { return 2; }\n",
+   "functions": {
+    "a1": [
+     1
+    ],
+    "a2": [
+     2
+    ]
+   }
+  },
+  {
+   "name": "void-with-bare-return",
+   "text": "void v(int n)\n{\n    if (n) {\n        return;\n    }\n    n = 0;\n    (void)n;\n}\n",
+   "functions": {
+    "v": [
+     4
+    ]
+   }
+  }
+ ]
+}

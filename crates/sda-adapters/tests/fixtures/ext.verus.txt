@@ -1,0 +1,11 @@
+error: postcondition not satisfied
+  --> guard.rs:41:9
+   |
+41 |         in_range(result),
+   |         ^^^^^^^^^^^^^^^^ failed this postcondition
+42 | {
+43 |     command
+   |     ------- at the end of the function body
+
+error: aborting due to 1 previous error
+

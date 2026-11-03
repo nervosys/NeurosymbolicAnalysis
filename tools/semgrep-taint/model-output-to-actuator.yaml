@@ -1,0 +1,12 @@
+rules:
+  - id: model-output-to-actuator
+    mode: taint
+    message: model output reaches the actuator without passing through the guard
+    languages: [python]
+    severity: ERROR
+    pattern-sources:
+      - pattern: infer(...)
+    pattern-sanitizers:
+      - pattern: clamp(...)
+    pattern-sinks:
+      - pattern: write_actuator(...)

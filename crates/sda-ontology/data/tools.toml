@@ -1,0 +1,697 @@
+# The statodynamic analysis tool ontology.
+#
+# This is the catalogue an agent reads to answer "what should I run to find X?"
+# without a human having memorised the landscape. Every entry records what the
+# tool *is*, what it can *find*, what it *costs*, and — the part most tool lists
+# omit — what it cannot do.
+#
+# `origin = "native"` entries are this toolkit's own engines and run by default.
+# Everything else is an adapter: recognised, described, and runnable, but only
+# when the operator opts in.
+#
+# Fields
+#   id            provider id, matching the Analyzer that implements or wraps it
+#   name          human name
+#   origin        native | external
+#   kind          static | dynamic | hybrid
+#   languages     c, cpp, rust, python, model-artifact, any
+#   capabilities  from sda_core::Capability
+#   exe           executable that must be on PATH (external only)
+#   url           homepage
+#   cost          free | free-tier | commercial
+#   maturity      experimental | stable | mature
+#   requires_build whether the target must be built first
+#   soundness     complete | sound | heuristic | unsound
+#                   complete  — no false negatives within its stated scope
+#                   sound     — no false positives
+#                   heuristic — neither guarantee
+#                   unsound   — may miss and may over-report
+#   limits        what this tool cannot establish, in one sentence
+
+# ============================================================================
+# Native engines — the default providers
+# ============================================================================
+
+[[tool]]
+id = "sda.static.c"
+name = "NERVOSYS native C checker"
+origin = "native"
+kind = "static"
+languages = ["c"]
+capabilities = ["style-compliance", "metrics-collection", "program-fact-extraction"]
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Works from tokens and structure only; guidelines needing type information are routed elsewhere and reported as unchecked."
+detects = ["MISRA-C-2023"]
+
+[[tool]]
+id = "sda.static.cpp"
+name = "NERVOSYS native C++ checker"
+origin = "native"
+kind = "static"
+languages = ["cpp"]
+capabilities = ["style-compliance", "metrics-collection", "program-fact-extraction"]
+cost = "free"
+maturity = "experimental"
+requires_build = false
+soundness = "heuristic"
+limits = "The MISRA C++:2023 catalogue is partial; guidelines absent from it are not checked at all, and unconfirmed rule numbers are cited by clause."
+detects = ["MISRA-CPP-2023"]
+
+[[tool]]
+id = "sda.static.rust"
+name = "NERVOSYS native Rust checker"
+origin = "native"
+kind = "static"
+languages = ["rust"]
+capabilities = ["style-compliance", "memory-safety", "model-artifact-scan"]
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Covers the discipline around Rust's escape hatches, not the lints clippy already provides."
+detects = ["RUST-2024"]
+
+[[tool]]
+id = "sda.dynamic"
+name = "NERVOSYS native dynamic engine"
+origin = "native"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["memory-safety", "undefined-behavior", "concurrency-safety", "coverage-measurement", "performance-profiling"]
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "sound"
+limits = "Only reports what actually executed; says nothing about paths no run reached."
+
+[[tool]]
+id = "sda.fuzz"
+name = "NERVOSYS native fuzzer"
+origin = "native"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["fuzzing", "coverage-measurement", "memory-safety", "undefined-behavior"]
+cost = "free"
+maturity = "experimental"
+requires_build = true
+soundness = "sound"
+limits = "Executes a process per input, so throughput is tens of runs per second rather than thousands; it substitutes comparison feedback for brute force, and still finds only what it reaches. On hosted Linux, AFL++ is far faster; this exists for targets AFL cannot instrument."
+detects = ["CWE"]
+
+[[tool]]
+id = "sda.ai.artifact"
+name = "NERVOSYS model artifact scanner"
+origin = "native"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["model-artifact-scan", "dependency-audit"]
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Reads containers, not weights; no header inspection can reveal a backdoor in the parameters."
+detects = ["OWASP-LLM", "ATLAS", "NIST-AI-RMF"]
+
+[[tool]]
+id = "sda.ai.probe"
+name = "NERVOSYS model probe runner"
+origin = "native"
+kind = "dynamic"
+languages = ["model-artifact"]
+capabilities = ["model-behavior-probe"]
+cost = "free"
+maturity = "experimental"
+requires_build = false
+soundness = "heuristic"
+limits = "A probe that fires proves a behaviour; a probe that does not fire proves nothing, because the trigger space is unbounded."
+detects = ["OWASP-LLM", "ATLAS"]
+
+[[tool]]
+id = "sda.correlate"
+name = "NERVOSYS statodynamic correlation engine"
+origin = "native"
+kind = "hybrid"
+languages = ["c", "cpp", "rust"]
+capabilities = ["program-fact-extraction", "coverage-measurement"]
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "sound"
+limits = "Adjudicates between static and dynamic evidence; it produces no findings of its own."
+
+# ============================================================================
+# External static analysers
+# ============================================================================
+
+[[tool]]
+id = "ext.cppcheck"
+name = "Cppcheck"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["style-compliance", "memory-safety", "undefined-behavior"]
+exe = "cppcheck"
+url = "https://cppcheck.sourceforge.io/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "heuristic"
+limits = "Its MISRA addon requires a licensed rule-text file the user must supply separately."
+detects = ["MISRA-C-2023", "CWE"]
+
+[[tool]]
+id = "ext.clang-tidy"
+name = "clang-tidy"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["style-compliance", "memory-safety", "undefined-behavior", "metrics-collection"]
+exe = "clang-tidy"
+url = "https://clang.llvm.org/extra/clang-tidy/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "heuristic"
+limits = "Needs a compile_commands.json to resolve types; without one it analyses a guess."
+detects = ["CERT", "CWE"]
+
+[[tool]]
+id = "ext.clang-analyzer"
+name = "Clang Static Analyzer"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["memory-safety", "undefined-behavior", "taint-analysis"]
+exe = "scan-build"
+url = "https://clang-analyzer.llvm.org/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Path-sensitive but bounded; deep interprocedural paths are cut off silently."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.clippy"
+name = "Clippy"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["style-compliance", "memory-safety"]
+exe = "cargo-clippy"
+url = "https://doc.rust-lang.org/clippy/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Lints idiomatic Rust; says little about unsafe blocks beyond their existence."
+detects = ["RUST-2024"]
+
+[[tool]]
+id = "ext.semgrep"
+name = "Semgrep"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp", "rust", "python"]
+capabilities = ["style-compliance", "taint-analysis"]
+exe = "semgrep"
+url = "https://semgrep.dev/"
+cost = "free-tier"
+maturity = "mature"
+requires_build = false
+soundness = "heuristic"
+limits = "Pattern matching over syntax; no type resolution, so casts and aliases evade it."
+detects = ["CWE", "OWASP-LLM"]
+
+[[tool]]
+id = "ext.codeql"
+name = "CodeQL"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp", "rust", "python"]
+capabilities = ["taint-analysis", "memory-safety", "program-fact-extraction"]
+exe = "codeql"
+url = "https://codeql.github.com/"
+cost = "free-tier"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Requires building the project into a database first, which takes as long as a build."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.infer"
+name = "Infer"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["memory-safety", "concurrency-safety"]
+exe = "infer"
+url = "https://fbinfer.com/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Separation-logic based; strong on null and leaks, quiet on arithmetic."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.frama-c"
+name = "Frama-C"
+origin = "external"
+kind = "static"
+languages = ["c"]
+capabilities = ["formal-verification", "undefined-behavior", "memory-safety"]
+exe = "frama-c"
+url = "https://frama-c.com/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "sound"
+limits = "Sound by abstract interpretation, so it over-reports; every alarm needs discharge."
+detects = ["CWE", "MISRA-C-2023"]
+
+[[tool]]
+id = "ext.cbmc"
+name = "CBMC"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["formal-verification", "undefined-behavior", "memory-safety"]
+exe = "cbmc"
+url = "https://www.cprover.org/cbmc/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "complete"
+limits = "Bounded model checking: complete only up to the unwinding bound you set."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.polyspace"
+name = "Polyspace"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["formal-verification", "undefined-behavior", "style-compliance"]
+exe = "polyspace-bug-finder"
+url = "https://www.mathworks.com/products/polyspace.html"
+cost = "commercial"
+maturity = "mature"
+requires_build = false
+soundness = "sound"
+limits = "Certified for functional-safety use, and priced accordingly."
+detects = ["MISRA-C-2023", "MISRA-CPP-2023", "CERT", "CWE"]
+
+[[tool]]
+id = "ext.coverity"
+name = "Coverity"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp", "rust", "python"]
+capabilities = ["memory-safety", "taint-analysis", "concurrency-safety"]
+exe = "cov-build"
+url = "https://www.blackduck.com/static-analysis-tools-sast/coverity.html"
+cost = "commercial"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Requires an instrumented build capture; results live in its own server."
+detects = ["CWE", "MISRA-C-2023"]
+
+[[tool]]
+id = "ext.pvs-studio"
+name = "PVS-Studio"
+origin = "external"
+kind = "static"
+languages = ["c", "cpp"]
+capabilities = ["memory-safety", "undefined-behavior", "style-compliance"]
+exe = "pvs-studio-analyzer"
+url = "https://pvs-studio.com/"
+cost = "commercial"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Needs a compile trace; strong on copy-paste and typo classes of defect."
+detects = ["MISRA-C-2023", "CWE", "CERT"]
+
+[[tool]]
+id = "ext.cargo-audit"
+name = "cargo-audit"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["dependency-audit"]
+exe = "cargo-audit"
+url = "https://rustsec.org/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "complete"
+limits = "Reports only advisories already published in the RustSec database."
+detects = ["CVE", "CWE"]
+
+[[tool]]
+id = "ext.cargo-geiger"
+name = "cargo-geiger"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["dependency-audit", "memory-safety"]
+exe = "cargo-geiger"
+url = "https://github.com/geiger-rs/cargo-geiger"
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "complete"
+limits = "Counts unsafe usage; it does not judge whether any of it is justified."
+detects = ["RUST-2024"]
+
+# ============================================================================
+# External dynamic analysers
+# ============================================================================
+
+[[tool]]
+id = "ext.valgrind"
+name = "Valgrind (memcheck)"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["memory-safety", "performance-profiling"]
+exe = "valgrind"
+url = "https://valgrind.org/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "Reports only what executed, and slows the target by roughly 20x."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.asan"
+name = "AddressSanitizer"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["memory-safety"]
+exe = "cc"
+url = "https://clang.llvm.org/docs/AddressSanitizer.html"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "A compile-time instrumentation, not a separate tool; needs a rebuild and a runtime library the target must have."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.ubsan"
+name = "UndefinedBehaviorSanitizer"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp"]
+capabilities = ["undefined-behavior"]
+exe = "cc"
+url = "https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "Catches only the UB classes it was built to instrument."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.tsan"
+name = "ThreadSanitizer"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["concurrency-safety"]
+exe = "cc"
+url = "https://clang.llvm.org/docs/ThreadSanitizer.html"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "Finds races on paths that ran with the interleaving that happened."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.miri"
+name = "Miri"
+origin = "external"
+kind = "dynamic"
+languages = ["rust"]
+capabilities = ["undefined-behavior", "memory-safety"]
+exe = "cargo-miri"
+url = "https://github.com/rust-lang/miri"
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "sound"
+limits = "Interprets MIR, so it is slow and cannot run code that calls foreign functions."
+detects = ["RUST-2024", "CWE"]
+
+[[tool]]
+id = "ext.afl"
+name = "AFL++"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["fuzzing", "coverage-measurement", "memory-safety"]
+exe = "afl-fuzz"
+url = "https://aflplus.plus/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "Finds only what it reaches; coverage plateaus are not proofs."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.libfuzzer"
+name = "libFuzzer"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["fuzzing", "coverage-measurement"]
+exe = "clang"
+url = "https://llvm.org/docs/LibFuzzer.html"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "sound"
+limits = "In-process, so a crash ends the campaign until the input is triaged."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.klee"
+name = "KLEE"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp"]
+capabilities = ["formal-verification", "coverage-measurement", "fuzzing"]
+exe = "klee"
+url = "https://klee-se.org/"
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "sound"
+limits = "Symbolic execution; path explosion bounds it well short of whole programs."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.perf"
+name = "perf"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["performance-profiling"]
+exe = "perf"
+url = "https://perfwiki.github.io/"
+cost = "free"
+maturity = "mature"
+requires_build = true
+soundness = "heuristic"
+limits = "Sampling profiler; Linux only."
+
+[[tool]]
+id = "ext.strace"
+name = "strace"
+origin = "external"
+kind = "dynamic"
+languages = ["c", "cpp", "rust"]
+capabilities = ["program-fact-extraction"]
+exe = "strace"
+url = "https://strace.io/"
+cost = "free"
+maturity = "mature"
+requires_build = false
+soundness = "sound"
+limits = "Syscall boundary only; Linux only."
+
+# ============================================================================
+# External AI model security tools
+# ============================================================================
+
+[[tool]]
+id = "ext.modelscan"
+name = "ModelScan"
+origin = "external"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["model-artifact-scan"]
+exe = "modelscan"
+url = "https://github.com/protectai/modelscan"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Scans serialization formats for unsafe operators; says nothing about weights."
+detects = ["OWASP-LLM", "CWE"]
+
+[[tool]]
+id = "ext.picklescan"
+name = "picklescan"
+origin = "external"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["model-artifact-scan"]
+exe = "picklescan"
+url = "https://github.com/mmaitre314/picklescan"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Pickle opcode denylist; a novel gadget chain can evade it."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.garak"
+name = "garak"
+origin = "external"
+kind = "dynamic"
+languages = ["model-artifact"]
+capabilities = ["model-behavior-probe"]
+exe = "garak"
+url = "https://github.com/NVIDIA/garak"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "A large probe corpus, but absence of a hit is still not evidence of safety."
+detects = ["OWASP-LLM", "ATLAS"]
+
+[[tool]]
+id = "ext.pyrit"
+name = "PyRIT"
+origin = "external"
+kind = "dynamic"
+languages = ["model-artifact"]
+capabilities = ["model-behavior-probe"]
+exe = "pyrit"
+url = "https://github.com/Azure/PyRIT"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "heuristic"
+limits = "Red-teaming orchestration; results depend entirely on the attack corpus supplied."
+detects = ["OWASP-LLM", "ATLAS"]
+
+[[tool]]
+id = "ext.verus"
+name = "Verus"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["deductive-proof", "formal-verification", "memory-safety", "undefined-behavior"]
+exe = "cargo-verus"
+url = "https://github.com/verus-lang/verus"
+cost = "free"
+maturity = "experimental"
+requires_build = true
+soundness = "complete"
+limits = "Proves only the pre/postconditions and invariants you wrote. Unspecified code is unconstrained and verifies vacuously; `assume`, `external_body` and `#[verifier::external]` are trusted, not proved. Covers a subset of Rust and pins an exact rustc, which must be installed alongside. Driven as `cargo verus verify`; the standalone `verus` binary exits 0 even when a proof fails, so nothing about its exit status is a result."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.kani"
+name = "Kani"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["formal-verification", "memory-safety", "undefined-behavior", "concurrency-safety"]
+exe = "cargo-kani"
+url = "https://model-checking.github.io/kani/"
+cost = "free"
+maturity = "stable"
+requires_build = true
+soundness = "complete"
+limits = "Bounded model checking via CBMC: complete only up to the loop unwinding bound, and only for the harnesses you write. No harness means no result, not a clean one."
+detects = ["CWE"]
+
+[[tool]]
+id = "ext.creusot"
+name = "Creusot"
+origin = "external"
+kind = "static"
+languages = ["rust"]
+capabilities = ["deductive-proof", "formal-verification"]
+exe = "cargo-creusot"
+url = "https://github.com/creusot-rs/creusot"
+cost = "free"
+maturity = "experimental"
+requires_build = true
+soundness = "complete"
+limits = "Translates annotated Rust to Why3 and discharges the obligations there. Proves only what the contracts state, needs Why3 and its provers installed alongside, and unsafe code is outside its model."
+detects = []
+
+[[tool]]
+id = "ext.marabou"
+name = "Marabou"
+origin = "external"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["neural-property-verification", "formal-verification"]
+exe = "Marabou"
+url = "https://github.com/NeuralNetworkVerification/Marabou"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "complete"
+limits = "Proves a property over one stated input region of one network. The result is local: it says nothing outside that region and nothing about a retrained network. Complete for piecewise-linear (ReLU) feed-forward and convolutional networks at thousands to low tens of thousands of neurons; a non-piecewise-linear activation puts a network outside it. A property nobody wrote is a property nobody checked."
+detects = []
+
+[[tool]]
+id = "ext.abcrown"
+name = "alpha-beta-CROWN"
+origin = "external"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["neural-property-verification", "formal-verification"]
+exe = "abcrown.py"
+url = "https://github.com/Verified-Intelligence/alpha-beta-CROWN"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "complete"
+limits = "Bound propagation with branch and bound over a stated input region; returns `unknown` when the bound is too loose to decide, which is neither a proof nor a counterexample and must not be read as either. Local robustness only. Reaches convolutional networks of a few million parameters and MLPs about five times smaller; recurrent networks only after unrolling to a fixed horizon. Research forks bound small transformers, but over perturbations of the *embeddings* — which is not a claim about the tokens that map into them — and nothing reaches a language model."
+detects = []
+
+[[tool]]
+id = "ext.nnenum"
+name = "nnenum"
+origin = "external"
+kind = "static"
+languages = ["model-artifact"]
+capabilities = ["neural-property-verification", "formal-verification"]
+exe = "nnenum.py"
+url = "https://github.com/stanleybak/nnenum"
+cost = "free"
+maturity = "stable"
+requires_build = false
+soundness = "complete"
+limits = "Complete for ReLU feed-forward and convolutional networks: it decides the property rather than bounding it, and returns a concrete counterexample when one exists. That completeness costs scale — thousands to low tens of thousands of neurons — and it needs piecewise-linear activations throughout, so a `tanh` gate or a softmax puts a network outside it entirely."
+detects = []

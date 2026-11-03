@@ -1,0 +1,261 @@
+# The NERVOSYS LLM vulnerability taxonomy.
+#
+# Organised around the question an embedded-systems team actually has to answer:
+# *what can go wrong with a model that ships inside our firmware, and how would
+# we find out?* Each risk carries the analysis phase that can detect it, which is
+# what lets the planner route it to the artifact scanner, the probe runner, or
+# neither.
+#
+# Fields
+#   id       stable identifier
+#   title    short name
+#   detail   why it matters on an embedded target specifically
+#   phase    static | dynamic | both | manual
+#   severity info | low | medium | high | critical
+#   owasp    OWASP Top 10 for LLM Applications (2025) identifier
+#   atlas    MITRE ATLAS technique
+#   rmf      NIST AI RMF subcategories most directly engaged
+#   cwe      CWE cross-reference
+
+[[risk]]
+id = "SLEEPER-AGENT"
+title = "Backdoored / sleeper-agent behaviour"
+detail = """
+A model trained to behave normally until a trigger appears in its input — a date, \
+a rare token, a phrase, a serial number. Safety training does not reliably remove \
+such behaviour and can teach the model to conceal it better. On an embedded target \
+this is the highest-consequence risk in the taxonomy: the device passes every \
+acceptance test and misbehaves in the field, on the attacker's schedule. Static \
+analysis can find candidate triggers in the tokenizer; only a probe campaign can \
+demonstrate the behaviour, and neither can prove absence."""
+phase = "both"
+severity = "critical"
+owasp = "LLM04"
+atlas = "AML.T0018"
+rmf = ["MEASURE 2.7", "MEASURE 2.6", "MANAGE 4.1"]
+cwe = 506
+
+[[risk]]
+id = "MODEL-POISONING"
+title = "Training-data or fine-tune poisoning"
+detail = """
+Corrupted training or fine-tuning data that shifts the model's behaviour on chosen \
+inputs. Distinguished from a sleeper agent by intent and precision rather than \
+mechanism. Detectable statically only through provenance: who produced the weights, \
+from what data, verified how."""
+phase = "manual"
+severity = "high"
+owasp = "LLM04"
+atlas = "AML.T0020"
+rmf = ["MAP 2.3", "MEASURE 2.8", "GOVERN 6.1"]
+cwe = 1395
+
+[[risk]]
+id = "UNSAFE-DESERIALIZATION"
+title = "Code execution during model load"
+detail = """
+Pickle-based formats (.pt, .pth, .ckpt, .bin) execute arbitrary callables when \
+loaded. This is not a bug in any implementation — it is what the format does. A \
+device that fetches a model update and loads it with torch.load has a remote code \
+execution path with no exploit required."""
+phase = "static"
+severity = "critical"
+owasp = "LLM03"
+atlas = "AML.T0010"
+rmf = ["MANAGE 2.2", "MEASURE 2.7"]
+cwe = 502
+
+[[risk]]
+id = "SUPPLY-CHAIN"
+title = "Unverified model provenance"
+detail = """
+A model referenced by a mutable tag, downloaded without signature or digest \
+verification, or built into firmware without a recorded hash. The integrity of the \
+whole inference path rests on a file whose identity nobody checks."""
+phase = "static"
+severity = "high"
+owasp = "LLM03"
+atlas = "AML.T0010"
+rmf = ["GOVERN 6.1", "MAP 4.1", "MANAGE 3.1"]
+cwe = 494
+
+[[risk]]
+id = "PROMPT-INJECTION"
+title = "Prompt injection"
+detail = """
+Instructions carried in data the model reads — a sensor label, a filename, a field \
+from a network packet — displacing the instructions the integrator wrote. Severe in \
+proportion to what the model is allowed to do, which on an agentic embedded system \
+is often 'actuate something'."""
+phase = "dynamic"
+severity = "high"
+owasp = "LLM01"
+atlas = "AML.T0051"
+rmf = ["MEASURE 2.7", "MANAGE 2.2"]
+cwe = 74
+
+[[risk]]
+id = "INDIRECT-INJECTION"
+title = "Indirect prompt injection via retrieved content"
+detail = """
+The same mechanism, delivered through content the system fetches rather than \
+content the user types: a poisoned document in a retrieval corpus, a manipulated \
+firmware release note, a crafted response from an upstream service."""
+phase = "dynamic"
+severity = "high"
+owasp = "LLM01"
+atlas = "AML.T0051"
+rmf = ["MEASURE 2.7", "MAP 5.1"]
+cwe = 74
+
+[[risk]]
+id = "JAILBREAK"
+title = "Safety-guardrail bypass"
+detail = """
+Input patterns that defeat whatever refusal behaviour the model was trained to \
+have. Relevant wherever the model's refusals are load-bearing for a safety claim — \
+which is a design smell in itself, since a trained behaviour is not a control."""
+phase = "dynamic"
+severity = "medium"
+owasp = "LLM01"
+atlas = "AML.T0054"
+rmf = ["MEASURE 2.7", "MEASURE 2.11"]
+cwe = 693
+
+[[risk]]
+id = "CENSORSHIP-BIAS"
+title = "Undisclosed refusal, censorship, or viewpoint conditioning"
+detail = """
+Systematic refusal or slanting on particular topics, entities, or languages, \
+introduced by the model's producer and not documented. Distinct from a safety \
+guardrail: the point is that the behaviour is undisclosed, so an integrator cannot \
+know whether the model will answer a question their product depends on. Measured by \
+differential probing across matched prompt pairs."""
+phase = "dynamic"
+severity = "medium"
+owasp = "LLM09"
+atlas = "AML.T0048"
+rmf = ["MEASURE 2.11", "MAP 1.1", "GOVERN 5.1"]
+
+[[risk]]
+id = "MEMORIZATION"
+title = "Training-data memorization and leakage"
+detail = """
+Verbatim reproduction of training data — credentials, personal data, licensed text — \
+under extraction prompts. On an embedded device the leak channel is whatever the \
+model's output reaches."""
+phase = "dynamic"
+severity = "medium"
+owasp = "LLM02"
+atlas = "AML.T0024"
+rmf = ["MEASURE 2.10", "MANAGE 4.1"]
+cwe = 200
+
+[[risk]]
+id = "MODEL-EXTRACTION"
+title = "Model extraction and theft"
+detail = """
+Recovering weights or a functional equivalent. On an embedded target the weights are \
+physically in the attacker's hands, so the question is not whether extraction is \
+possible but whether anything depends on it being hard."""
+phase = "manual"
+severity = "medium"
+owasp = "LLM10"
+atlas = "AML.T0044"
+rmf = ["MAP 5.1", "MANAGE 2.3"]
+cwe = 1300
+
+[[risk]]
+id = "ADVERSARIAL-INPUT"
+title = "Adversarial perturbation"
+detail = """
+Inputs perturbed to force a chosen output. The classic risk for the vision and audio \
+models that dominate embedded deployment, where the input comes from a sensor an \
+attacker may control physically."""
+phase = "dynamic"
+severity = "high"
+owasp = "LLM01"
+atlas = "AML.T0043"
+rmf = ["MEASURE 2.7", "MEASURE 2.6"]
+
+[[risk]]
+id = "EXCESSIVE-AGENCY"
+title = "Excessive agency"
+detail = """
+The model is wired to tools or actuators whose blast radius exceeds what its \
+reliability justifies. The defect is in the integration, not the model, which is \
+what makes it findable by static analysis of the calling code."""
+phase = "static"
+severity = "high"
+owasp = "LLM06"
+atlas = "AML.T0053"
+rmf = ["MAP 3.4", "MANAGE 1.3", "GOVERN 1.3"]
+cwe = 250
+
+[[risk]]
+id = "UNBOUNDED-INFERENCE"
+title = "Unbounded context, token, or memory use"
+detail = """
+Inference without a hard bound on input length, generated tokens, or KV-cache size. \
+On a device with fixed RAM and a watchdog, an unbounded generation is a denial of \
+service and possibly a memory-safety failure."""
+phase = "both"
+severity = "high"
+owasp = "LLM10"
+atlas = "AML.T0029"
+rmf = ["MEASURE 2.5", "MANAGE 2.2"]
+cwe = 400
+
+[[risk]]
+id = "MALFORMED-ARTIFACT"
+title = "Malformed or hostile model container"
+detail = """
+Header fields — tensor offsets, dimension counts, vocabulary sizes — that lie about \
+the file. A runtime that memory-maps the model and trusts its header reads out of \
+bounds. This is an ordinary memory-safety bug reached through a file format, and it \
+is exactly what the native container parsers check for."""
+phase = "static"
+severity = "high"
+owasp = "LLM03"
+atlas = "AML.T0010"
+rmf = ["MEASURE 2.7", "MANAGE 2.2"]
+cwe = 1284
+
+[[risk]]
+id = "TOKENIZER-ANOMALY"
+title = "Anomalous tokenizer entries"
+detail = """
+Unreachable or under-trained tokens ('glitch tokens'), and tokens whose text looks \
+like a trigger phrase or a control marker. Neither is proof of a backdoor, but both \
+are cheap to find statically and are the right input to a targeted probe campaign."""
+phase = "static"
+severity = "low"
+owasp = "LLM04"
+atlas = "AML.T0018"
+rmf = ["MEASURE 2.7"]
+
+[[risk]]
+id = "TEMPLATE-INJECTION"
+title = "Executable chat template shipped with the model"
+detail = """
+GGUF and similar formats embed a Jinja chat template that the runtime renders with \
+user-controlled input. A template carrying control flow or unescaped substitution is \
+model-supplied logic executing in the host's inference process."""
+phase = "static"
+severity = "medium"
+owasp = "LLM01"
+atlas = "AML.T0051"
+rmf = ["MEASURE 2.7", "MANAGE 2.2"]
+cwe = 1336
+
+[[risk]]
+id = "UNDOCUMENTED-CAPABILITY"
+title = "Undocumented model capability or licence"
+detail = """
+A model artifact with no recorded licence, architecture, or origin. Not a \
+vulnerability on its own; it is the absence of the evidence every other judgement \
+depends on, and it blocks the governance function of the NIST AI RMF outright."""
+phase = "static"
+severity = "low"
+owasp = "LLM03"
+rmf = ["GOVERN 1.1", "GOVERN 6.1", "MAP 4.1"]

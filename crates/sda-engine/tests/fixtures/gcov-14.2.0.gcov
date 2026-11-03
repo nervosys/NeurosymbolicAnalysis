@@ -1,0 +1,49 @@
+        -:    0:Source:main.c
+        -:    0:Graph:build/main.gcno
+        -:    0:Data:build/main.gcda
+        -:    0:Runs:1
+        -:    1:/* A program written to produce three correlation verdicts in one run.
+        -:    2: *
+        -:    3: * It exists to exercise the path where every piece of runtime evidence comes
+        -:    4: * from an external tool: Memcheck supplies the defect, gcov supplies the
+        -:    5: * execution counts, and nothing here is instrumented with the SDA probe shim.
+        -:    6: *
+        -:    7: *   line 21  allocation in dead code, gcov measures it at zero  -> unreached
+        -:    8: *   line 30  leaked allocation, Memcheck reports the loss       -> confirmed
+        -:    9: *   line 37  library call in a hot loop, executed 40 times      -> refuted
+        -:   10: *
+        -:   11: * See tools/coverage-wsl/README.md for the commands that drive it.
+        -:   12: */
+        -:   13:#include <stdio.h>
+        -:   14:#include <stdlib.h>
+        -:   15:
+        -:   16:/* Never called. gcov records these lines as executable and unexecuted, which is
+        -:   17: * what makes `unreached` a claim about this code rather than about the
+        -:   18: * instrument. */
+    #####:   19:static void never(void)
+        -:   20:{
+    #####:   21:    char *q = malloc(8);
+        -:   22:    (void)q;
+    #####:   23:}
+        -:   24:
+        1:   25:int main(void)
+        -:   26:{
+        1:   27:    int s = 0;
+        -:   28:    int i;
+        -:   29:
+        1:   30:    char *p = malloc(16);
+        1:   31:    if (p == NULL) {
+    #####:   32:        return 1;
+        -:   33:    }
+        -:   34:
+       41:   35:    for (i = 0; i < 40; i++) {
+       40:   36:        s += i * 2;
+       40:   37:        printf(".");
+        -:   38:    }
+        1:   39:    if (s < 0) {
+    #####:   40:        never();
+        -:   41:    }
+        1:   42:    printf("\n%d\n", s);
+        -:   43:    /* p is never freed: this is the defect Memcheck witnesses. */
+        1:   44:    return 0;
+        -:   45:}

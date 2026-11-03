@@ -1,0 +1,50 @@
+{
+  "func-details": {
+    "guard::unchecked": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "guard::LIMIT": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "guard::main": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::function::axiom_fn_mut_call_ensures": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "guard::clamp": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::function::axiom_fn_mut_call_requires": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "guard::in_range": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    }
+  },
+  "verification-results": {
+    "encountered-error": true,
+    "encountered-vir-error": false,
+    "success": false,
+    "verified": 3,
+    "errors": 1,
+    "is-verifying-entire-crate": true
+  },
+  "verus": {
+    "profile": "release",
+    "version": "0.2026.08.30.b432e82",
+    "platform": {
+      "os": "linux",
+      "arch": "x86_64"
+    },
+    "toolchain": "1.97.1-x86_64-unknown-linux-gnu",
+    "commit": "b432e82fed7e05090fd53b5e5fc39020f725aabe"
+  }
+}

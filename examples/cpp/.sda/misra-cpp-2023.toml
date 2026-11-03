@@ -1,0 +1,9 @@
+standard = "MISRA C++:2023"
+
+[[rule]]
+n = "8.2.2"
+t = "no reinterpret_cast (a project's own label)"
+o = "required"
+d = "decidable"
+s = "single"
+c = "native"

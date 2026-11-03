@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-glyph-markers"
+description = "Enables the glyph_markers command without any pre-configured scope."
+commands.allow = ["glyph_markers"]
+
+[[permission]]
+identifier = "deny-glyph-markers"
+description = "Denies the glyph_markers command without any pre-configured scope."
+commands.deny = ["glyph_markers"]

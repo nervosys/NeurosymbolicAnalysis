@@ -1,0 +1,41 @@
+info: downloading component rust-src
+Preparing a sysroot for Miri (target: x86_64-pc-windows-msvc)... done
+   Compiling miridemo v0.1.0 (<tmp>/miridemo)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
+     Running unittests src\lib.rs (<target>\miri\x86_64-pc-windows-msvc\debug\build\miridemo/824b9e9f445b3f8c\out\miridemo-824b9e9f445b3f8c.exe)
+error: Undefined Behavior: attempting a read access using <142242> at alloc46271[0x0], but that tag does not exist in the borrow stack for this location
+  --> src\lib.rs:11:9
+   |
+11 |         *r1
+   |         ^^^ this error occurs as part of an access at alloc46271[0x0..0x1]
+   |
+   = help: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+   = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information
+help: <142242> was created by a SharedReadWrite retag at offsets [0x0..0x1]
+  --> src\lib.rs:6:14
+   |
+ 6 |     let r1 = &mut v as *mut u8;
+   |              ^^^^^^
+help: <142242> was later invalidated at offsets [0x0..0x1] by a Unique retag
+  --> src\lib.rs:7:14
+   |
+ 7 |     let r2 = &mut v as *mut u8;
+   |              ^^^^^^
+   = note: this is on thread `reads_through_an_invalidated_pointer`
+   = note: stack backtrace:
+           0: ub
+               at src\lib.rs:11:9: 11:12
+           1: reads_through_an_invalidated_pointer
+               at src\lib.rs:17:16: 17:20
+           2: reads_through_an_invalidated_pointer::{closure#0}
+               at src\lib.rs:16:42: 16:42
+
+note: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+
+error: aborting due to 1 previous error
+
+error: test failed, to rerun pass `--lib`
+
+Caused by:
+  process didn't exit successfully: `<rustup>\toolchains\nightly-x86_64-pc-windows-msvc\bin\cargo-miri.exe runner '<target>\miri\x86_64-pc-windows-msvc\debug\build\miridemo/824b9e9f445b3f8c\out\miridemo-824b9e9f445b3f8c.exe'` (exit code: 1)
+note: test exited abnormally; to see the full output pass --no-capture to the harness.

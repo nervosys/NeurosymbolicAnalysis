@@ -1,0 +1,20 @@
+# Approved departures for the example firmware. Part of the compliance record,
+# so it lives next to the code rather than on a command line.
+#
+# Paths are matched against the location as reported, which is relative to the
+# analysis root.
+[[deviation]]
+rule = "MISRA-C-2023-21.6"
+scope = "file"
+path = "src/main.c"
+rationale = "diagnostic build only; the shipping configuration compiles this out"
+approver = "a.erickson"
+reference = "ECR-4412"
+
+# Rejected on purpose, to show that the register is enforced rather than
+# trusted: 9.1 is Mandatory and may never be deviated.
+[[deviation]]
+rule = "MISRA-C-2023-9.1"
+scope = "project"
+rationale = "we would rather not fix this"
+approver = "a.erickson"
