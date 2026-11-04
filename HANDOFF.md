@@ -152,6 +152,13 @@ There are no macOS artifacts, the `.deb` and AppImage need glibc 2.39 because th
 were built on Debian 13 rather than the workflow's Ubuntu 22.04, and the FreeBSD
 CLI was not run on FreeBSD. The README and the release notes say so.
 
+**`release.yml` has run since, and passed.** Dispatched on `master` at `aa313d8`, it
+built Windows, Linux, macOS and FreeBSD. The `draft` job was skipped, because it
+runs only on a tag, so that job is still untested, and none of those artifacts were
+published or run. A tag is the next test, and it would bring macOS archives and a
+`.deb` built on Ubuntu 22.04. GitHub had not registered the workflow until a push
+changed the file, so the `v1.0.0` tag started no run.
+
 **The public history starts at 1.0.0.** Until rc.1 the MISRA catalogues carried
 a `t =` title for every guideline, 210 for C and 54 for C++. The header called
 them paraphrases; nobody had compared them with the licensed text, and many read
