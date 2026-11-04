@@ -153,11 +153,21 @@ were built on Debian 13 rather than the workflow's Ubuntu 22.04, and the FreeBSD
 CLI was not run on FreeBSD. The README and the release notes say so.
 
 **`release.yml` has run since, and passed.** Dispatched on `master` at `aa313d8`, it
-built Windows, Linux, macOS and FreeBSD. The `draft` job was skipped, because it
-runs only on a tag, so that job is still untested, and none of those artifacts were
-published or run. A tag is the next test, and it would bring macOS archives and a
-`.deb` built on Ubuntu 22.04. GitHub had not registered the workflow until a push
-changed the file, so the `v1.0.0` tag started no run.
+built Windows, Linux, macOS and FreeBSD. GitHub had not registered the workflow until
+a push changed the file, so the `v1.0.0` tag started no run.
+
+**1.0.1 came from the workflow, and is the latest release.** It is the same code as
+1.0.0, tagged at `73013f2`. It adds macOS CLI archives and a `.deb` from Ubuntu 22.04,
+which needs glibc 2.34. Every job ran, including `draft`, which waits for approval in
+the `release` environment. Checked:
+* CI installed the `.deb` and ran `sda`, and ran the arm64 macOS CLI;
+* on this machine, the CI installer installed, ran and uninstalled with PATH unchanged,
+  and the `.deb`'s `sda` and the musl CLI ran under WSL;
+* the draft's assets passed `SHA256SUMS` after download.
+
+Not run: the x86_64 macOS CLI, and the FreeBSD CLI on FreeBSD. The workbench was not
+launched from this release's installer, `.deb` or AppImage. The tag's `CHANGELOG.md`
+says the `.deb` needs glibc 2.35; the release notes and `master` say 2.34.
 
 **The MSRV of 1.88 holds, checked by hand on 2026-11-03.** With `rustc 1.88.0` and
 `--locked`, the workspace builds and all 1,101 tests pass, and the GUI crate builds.
