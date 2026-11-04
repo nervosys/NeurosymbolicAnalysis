@@ -159,6 +159,10 @@ published or run. A tag is the next test, and it would bring macOS archives and 
 `.deb` built on Ubuntu 22.04. GitHub had not registered the workflow until a push
 changed the file, so the `v1.0.0` tag started no run.
 
+**The MSRV of 1.88 holds, checked by hand on 2026-11-03.** With `rustc 1.88.0` and
+`--locked`, the workspace builds and all 1,101 tests pass, and the GUI crate builds.
+CI installs `stable`, so nothing keeps this true.
+
 **The public history starts at 1.0.0.** Until rc.1 the MISRA catalogues carried
 a `t =` title for every guideline, 210 for C and 54 for C++. The header called
 them paraphrases; nobody had compared them with the licensed text, and many read
