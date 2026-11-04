@@ -19,7 +19,7 @@ The same code as 1.0.0, built by the release workflow rather than on one machine
 
 ### Changed
 - The `.deb` is built on Ubuntu 22.04, and is installed and run there in CI. It
-  needs glibc 2.35, where 1.0.0's needed 2.39.
+  needs glibc 2.34, where 1.0.0's needed 2.39.
 - CI builds the workspace on the minimum supported Rust version, 1.88.
 - `v*` tags can be created only by repository admins, and a release needs a
   reviewer's approval.
