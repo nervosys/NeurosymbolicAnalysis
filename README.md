@@ -23,22 +23,21 @@ converts a coverage hole into a clean bill of health.
 
 ## Install
 
-The current release is **1.0.0**. Nothing is signed yet, so Windows SmartScreen
-will warn before the first run.
+The current release is **1.0.1**. Nothing is signed yet, so Windows SmartScreen
+and macOS Gatekeeper will warn before the first run.
 Each release carries a `SHA256SUMS` file; check a download against it before
 installing.
 
 | platform | GUI workbench | `sda` CLI only |
 |---|---|---|
 | Windows x64 | `StatodynamicAnalysis_<version>_x64-setup.exe` (per-user; adds `sda` to your `Path`) | `sda-<version>-x86_64-pc-windows-msvc.zip` |
-| Linux x64 | `.deb` or `.AppImage` (both need glibc 2.39: Ubuntu 24.04 or later) | `sda-<version>-x86_64-unknown-linux-musl.tar.gz`, a static binary for any x86_64 Linux |
-| macOS | not in 1.0.0, see below | not in 1.0.0: build from source |
+| Linux x64 | `.deb` (Ubuntu 22.04 or later) or `.AppImage` | `sda-<version>-x86_64-unknown-linux-musl.tar.gz`, a static binary for any x86_64 Linux |
+| macOS | built only on request, see below | `sda-<version>-aarch64-apple-darwin.tar.gz`, `…-x86_64-apple-darwin.tar.gz` |
 | FreeBSD x64 | none: Tauri does not support the BSDs | `sda-<version>-x86_64-unknown-freebsd.tar.gz` |
 
 Every archive holds the licence and the third-party notices for that target.
-1.0.0 was built on one machine, without a macOS runner, and its FreeBSD CLI was
-checked by file type but not run on FreeBSD. The macOS GUI is also withheld by
-default because the `objc2` crates it links are
+The FreeBSD CLI is cross-compiled and has not been run on FreeBSD. The macOS GUI
+is withheld by default because the `objc2` crates it links are
 derived from Apple's SDKs, and their own licence leaves open whether they may be
 redistributed.
 
@@ -1540,7 +1539,7 @@ toolkit free of any inference dependency.
 
 ## Security
 
-What `sda` does with code you did not write, as of `1.0.0`:
+What `sda` does with code you did not write, as of `1.0.1`:
 
 * **A default scan runs none of the project's code.** The native engines read
   source and model files and parse them; a pickle is walked opcode by opcode,

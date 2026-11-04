@@ -2575,7 +2575,7 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "sda-adapters"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-build",
  "sda-core",
@@ -2586,7 +2586,7 @@ dependencies = [
 
 [[package]]
 name = "sda-agent"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-adapters",
  "sda-ai",
@@ -2601,7 +2601,7 @@ dependencies = [
 
 [[package]]
 name = "sda-ai"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-core",
  "serde",
@@ -2614,7 +2614,7 @@ dependencies = [
 
 [[package]]
 name = "sda-build"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-core",
  "serde",
@@ -2623,7 +2623,7 @@ dependencies = [
 
 [[package]]
 name = "sda-core"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -2634,7 +2634,7 @@ dependencies = [
 
 [[package]]
 name = "sda-editor"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "ropey",
  "sda-core",
@@ -2644,7 +2644,7 @@ dependencies = [
 
 [[package]]
 name = "sda-engine"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-core",
  "sda-rules",
@@ -2656,7 +2656,7 @@ dependencies = [
 
 [[package]]
 name = "sda-ontology"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-core",
  "serde",
@@ -2666,7 +2666,7 @@ dependencies = [
 
 [[package]]
 name = "sda-rules"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "sda-core",
  "serde",
@@ -2675,14 +2675,14 @@ dependencies = [
 
 [[package]]
 name = "sda-syntax"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "sda-workbench"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "portable-pty",
  "sda-adapters",

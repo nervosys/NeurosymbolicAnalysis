@@ -9,6 +9,25 @@ must read exactly `## [<version>]`.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-04
+
+The same code as 1.0.0, built by the release workflow rather than on one machine.
+
+### Added
+- macOS CLI archives for arm64 and x86_64. The arm64 one is run in CI; the x86_64
+  one is built and not run. The macOS GUI is still not shipped.
+
+### Changed
+- The `.deb` is built on Ubuntu 22.04, and is installed and run there in CI. It
+  needs glibc 2.35, where 1.0.0's needed 2.39.
+- CI builds the workspace on the minimum supported Rust version, 1.88.
+- `v*` tags can be created only by repository admins, and a release needs a
+  reviewer's approval.
+
+### Fixed
+- CI checks out full history, which a test needs. CI had never run before the
+  repository went public, so this had not been seen.
+
 ## [1.0.0] - 2026-11-03
 
 rc.4 plus a MISRA C audit, a capability file for the workbench, and the first
