@@ -60,8 +60,9 @@ having**. Everything else is detail; that is the thing that will bite you.
 
   Still open: MCP tools accept any path, with the user's own reach. (The Tauri
   capability file this list also named was added after rc.4; see *1.0.0, and what is still open*.)
-* **Blocked on the owner.** GitHub Actions has never run: the account's billing
-  stops the job. `.github/workflows/verify.yml` is untested.
+* **GitHub Actions runs now.** Billing stopped every job until the repository went
+  public on 2026-11-03. `verify.yml` then passed on Windows and Ubuntu, once it
+  stopped checking out shallow.
 * **MISRA titles are gone.** The built-in catalogues hold numbers and classification
   only: 241 titles removed, as cppcheck also ships none. They had been rewritten
   without the licensed text, so nobody could say they were safe to ship. A finding
@@ -83,7 +84,7 @@ having**. Everything else is detail; that is the thing that will bite you.
 * **`1.0.0-rc.4` is prepared for four platforms, unsigned, in a private repository.**
   It is rc.2 plus the audit above, rebuilt the same way; rc.3 lacked the items under "Then, in rc.4".
   `.github/workflows/release.yml` builds every artifact from a tag into a draft
-  release, and has never run, because CI is blocked by billing; `actionlint` passes.
+  release, and had not run when rc.4 was built, because CI was blocked by billing.
   What was built and tested on this machine, from the tag, is in `E:\sda-release`:
   * Windows: the NSIS installer and a CLI zip. rc.4 was installed silently into a
     directory named with a `'`, put `sda` on PATH, ran, and on uninstall left the
@@ -144,7 +145,7 @@ having**. Everything else is detail; that is the thing that will bite you.
 ## 1.0.0, and what is still open
 
 **1.0.0 is the first public release, built on this machine and unsigned.** The
-release workflow has never run (see billing below), so the artifacts were built
+release workflow had not run (billing blocked it), so the artifacts were built
 locally by the recipe the release candidates used. They were uploaded with `gh`,
 with a `SHA256SUMS` file.
 There are no macOS artifacts, the `.deb` and AppImage need glibc 2.39 because they
@@ -169,12 +170,9 @@ git bundle and a local branch. Before the flip, a pre-publication audit also:
 being built has no section, rather than four platforms into a release run.
 
 **Only the owner can do these:**
-* **GitHub Actions billing.** Every run, including a re-run of `verify` on
-  2026-11-02, stops before a job starts. Until it runs, `release.yml` and
-  `verify.yml` are untested, and so is the MSRV of 1.88.
 * **Signing.** A Windows certificate, and an Apple Developer ID with
   notarisation for macOS.
-* **macOS.** A runner (CI, once billing works) and a decision on the objc2
+* **macOS.** A decision on the objc2
   redistribution question before the GUI ships there; the CLI does not link
   objc2.
 * **A security contact beyond GitHub's private reporting**, if one is wanted.

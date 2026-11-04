@@ -5,6 +5,9 @@
 # The macOS GUI is off unless asked for. It links the objc2 crates, whose own
 # LICENSE.md says it is unclear whether those crates, derived from Apple's SDKs,
 # may be distributed. That is the owner's decision, so it is an input.
+#
+# Dispatched on a branch, every platform builds and nothing is drafted, because
+# the draft job runs only on a tag. That is how to test this file.
 name: release
 
 on:
