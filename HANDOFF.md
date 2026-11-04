@@ -161,7 +161,13 @@ changed the file, so the `v1.0.0` tag started no run.
 
 **The MSRV of 1.88 holds, checked by hand on 2026-11-03.** With `rustc 1.88.0` and
 `--locked`, the workspace builds and all 1,101 tests pass, and the GUI crate builds.
-CI installs `stable`, so nothing keeps this true.
+`verify.yml`'s `msrv` job now builds the workspace on 1.88.0 on every push; the GUI
+crate is not in it.
+
+**Who can release.** A `release tags` ruleset lets only repository admins create,
+change or delete `v*` tags. `release.yml`'s `draft` job runs in a `release`
+environment that admits only `v*` tags and needs a reviewer's approval. Both are
+repository settings, not files, so a recreated repository loses them.
 
 **The public history starts at 1.0.0.** Until rc.1 the MISRA catalogues carried
 a `t =` title for every guideline, 210 for C and 54 for C++. The header called

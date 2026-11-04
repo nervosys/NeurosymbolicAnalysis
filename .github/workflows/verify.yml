@@ -12,6 +12,20 @@ permissions:
   contents: read
 
 jobs:
+  # The one thing the gate cannot check, because it runs on `stable`: that the
+  # version `rust-version` declares still builds. The GUI crate is left out; it
+  # needs the frontend and, on Linux, the system libraries.
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: '1.88.0'
+      - run: cargo build --locked --workspace --all-targets
+
   verify:
     strategy:
       fail-fast: false
