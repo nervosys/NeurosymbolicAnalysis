@@ -246,6 +246,35 @@ pub const C_FIXTURES: &[Fixture] = &[
     fx("21.21", "a.c", "void f(void) { system(\"ls\"); }\n"),
     fx("21.24", "a.c", "void f(void) { int n = rand(); (void)n; }\n"),
     fx("21.25", "a.c", "void f(void) { atomic_load_explicit(&x, memory_order_relaxed); }\n"),
+    // A return type that is not exactly `void`, with a `*` after the specifiers.
+    fx("17.10", "a.c", "_Noreturn void *die(void) { for (;;) { } }\n"),
+    // A bit-field in a union whose width is a macro, or a parenthesised number.
+    fx("6.3", "a.c", "#define WIDTH 2\nunion U { unsigned int f : WIDTH; };\n"),
+    fx("6.3", "a.c", "union U { unsigned int f : (2); };\n"),
+    // Parameters that are a typedef name, a tag with no name, or a prototype
+    // inside a function body.
+    fx("8.2", "a.c", "typedef unsigned char byte_t;\nvoid g(byte_t);\n"),
+    fx("8.2", "a.c", "struct point { int x; };\nvoid h(struct point);\n"),
+    fx("8.2", "a.c", "void g(void) {\n  int older(int, int);\n  older(1, 2);\n}\n"),
+    // An old-style (K&R) definition, with an identifier list and declarations.
+    fx("8.2", "a.c", "int add(a, b) int a; int b; { return a + b; }\n"),
+    // Consecutive labels with nothing between them are one clause, which is one
+    // clause too few for a switch.
+    fx("16.6", "a.c", "void f(int x) { switch (x) { case 1: case 2: g(); break; } }\n"),
+    fx("17.1", "a.c", "void f(void) { __builtin_va_list ap; (void)ap; }\n"),
+    // A label used by a goto in another function is still unused here.
+    fx("2.6", "a.c", "void a(void) { unused: return; }\nvoid b(void) { goto unused; unused: return; }\n"),
+    fx("20.14", "a.c", "#ifdef A\n#else\n#else\n#endif\n"),
+    fx("20.14", "a.c", "#if A\n#else\n#elif B\n#endif\n"),
+    fx("8.16", "a.c", "alignas(0u) int x;\n"),
+    // Only a literal `#if 0` is decided. `#if FOO` may be live, so its code counts.
+    fx("20.1", "a.c", "#if FOO\nint x;\n#endif\n#include <stddef.h>\n"),
+    // Review of the batch above.
+    fx("6.3", "a.c", "union U { struct { struct { unsigned int a : 2; }; }; int b; };\n"),
+    fx("15.2", "a.c", "void f(void) { done: ; goto done; }\n"),
+    fx("17.10", "a.c", "__attribute__((noreturn)) int die(void);\n"),
+    fx("20.10", "a.c", "#define STR(x) %:x\n"),
+    fx("20.10", "a.c", "#define CAT(a, b) a %:%: b\n"),
 ];
 
 /// Fixtures for the MISRA C++ checks.
@@ -1007,6 +1036,152 @@ pub const C_NEAR_MISSES: &[NearMiss] = &[
         "#ifndef Q_H\n#define Q_H\nint f(void);\n#endif\n",
         "the `#endif` is in the same file as its `#ifndef`, which is what 20.14 requires",
     ),
+    nm(
+        "15.2",
+        "a.c",
+        "void a(void) {\n  goto done;\n  g();\ndone:\n  return;\n}\nvoid b(void) {\n  goto done;\n  h();\ndone:\n  return;\n}\n",
+        "each `goto` jumps forward to the `done:` of its own function; another function's label of the same name is not the target",
+    ),
+    nm(
+        "17.10",
+        "a.c",
+        "_Noreturn static inline void die(void) { for (;;) { } }\n",
+        "the return type is `void` with other specifiers around it",
+    ),
+    nm(
+        "17.10",
+        "a.c",
+        "_Noreturn void die(void) { for (;;) { } }\n",
+        "a plain `void` return type",
+    ),
+    nm(
+        "8.10",
+        "a.c",
+        "static __attribute__((unused)) inline int f(void) { return 0; }\n",
+        "the `static` storage class comes before an attribute, which does not end the specifiers",
+    ),
+    nm(
+        "D4.10",
+        "a.h",
+        "#if !defined(FOO_H)\n#define FOO_H\nint f(void);\n#endif\n",
+        "the `#if !defined` form of the include guard, with its `#define` directly after",
+    ),
+    nm(
+        "11.10",
+        "a.c",
+        "_Atomic(void *) p;\n",
+        "a pointer to void is a complete type; only `_Atomic(void)` names the incomplete one",
+    ),
+    nm(
+        "20.1",
+        "a.c",
+        "#if 0\nint dead;\n#endif\n#include <stddef.h>\n",
+        "code under a literal `#if 0` is never compiled, so the include does come first",
+    ),
+    nm(
+        "6.3",
+        "a.c",
+        "struct S { unsigned int f : 2; };\n",
+        "a bit-field in a struct, not a union, has a defined layout",
+    ),
+    nm(
+        "6.3",
+        "a.c",
+        "union U { unsigned int f; };\n",
+        "a union member that is not a bit-field",
+    ),
+    nm(
+        "6.3",
+        "a.c",
+        "int g(int a) { int y = a ? 2 : 1; return y; }\n",
+        "a `:` in a conditional expression is not a bit-field",
+    ),
+    nm(
+        "6.2",
+        "a.c",
+        "int g(int a) { int y = a ? 2 : 1; return y; }\n",
+        "a `:` in a conditional expression is not a one-bit signed bit-field",
+    ),
+    nm(
+        "8.2",
+        "a.c",
+        "typedef unsigned char byte_t;\nvoid g(byte_t b);\n",
+        "the parameter has a name after its type",
+    ),
+    nm(
+        "8.2",
+        "a.c",
+        "struct point { int x; };\nvoid h(struct point p);\n",
+        "the tag is followed by the parameter's name",
+    ),
+    nm(
+        "8.2",
+        "a.c",
+        "void g(void) {\n  int older(int a, int b);\n  older(1, 2);\n}\n",
+        "a block-scope prototype with named parameters; the following call is not a prototype",
+    ),
+    nm(
+        "8.2",
+        "a.c",
+        "void f(int a, int b) {\n  g(a, b);\n}\n",
+        "a call statement is not a prototype, because it begins with a name rather than a type",
+    ),
+    nm(
+        "8.2",
+        "a.c",
+        "int x;\nMACRO(a) int a; { }\n",
+        "a macro invocation with the shape of a K&R definition has no return type before its name",
+    ),
+    nm(
+        "16.6",
+        "a.c",
+        "void f(int x) { switch (x) { case 1: case 2: g(); break; default: break; } }\n",
+        "consecutive labels are one clause, and the `default` is a second",
+    ),
+    nm(
+        "17.1",
+        "a.c",
+        "int __builtin_va_count(void) { return 0; }\n",
+        "a name that only resembles a builtin is not one",
+    ),
+    nm(
+        "2.6",
+        "a.c",
+        "void a(void) { goto done; done: return; }\nvoid b(void) { goto done; done: return; }\n",
+        "each label is the target of a `goto` in its own function",
+    ),
+    nm(
+        "20.14",
+        "a.c",
+        "#ifdef A\n#ifdef B\n#else\n#endif\n#else\n#endif\n",
+        "each nested conditional has one `#else` of its own",
+    ),
+    nm(
+        "20.14",
+        "a.c",
+        "#if A\n#elif B\n#else\n#endif\n",
+        "an `#elif` before the `#else` of its level",
+    ),
+    nm(
+        "8.16",
+        "a.c",
+        "alignas(0x10u) int x;\n",
+        "a nonzero alignment, written with a suffix and in hex",
+    ),
+    nm("17.10", "a.c", "__attribute__((noreturn)) void die(void);\n", "the word is the attribute's, and the return type is void"),
+    nm("17.10", "a.c", "__declspec(noreturn) void die(void);\n", "the word is the attribute's, and the return type is void"),
+    nm("17.10", "a.c", "[[noreturn]] void die(void);\n", "the word is the attribute's, and the return type is void"),
+    nm("17.10", "a.c", "void die(void) __attribute__((noreturn));\n", "a trailing attribute on a void function"),
+    nm("17.10", "a.c", "void _Noreturn die(void);\n", "the specifier may follow the return type"),
+    nm("8.2", "a.c", "int f(VOID);\n", "`VOID` is the Windows spelling of void"),
+    nm("8.2", "a.c", "int f(PARAMS);\n", "a macro may supply the whole parameter list"),
+    nm("8.2", "a.c", "static DEFINE_MUTEX(lock);\n", "a macro invocation, not a prototype"),
+    nm("8.2", "a.c", "struct S { int a ALIGNED(x); };\n", "a macro on a member; a struct body holds no prototypes"),
+    nm("8.2", "a.c", "void f(void) { int a UNUSED(a); }\n", "a macro on a local variable"),
+    nm("20.10", "a.c", "#define BANNER \"#1 release\"\n", "a `#` inside a string is not the operator"),
+    nm("20.10", "a.c", "#define HASH '#'\n", "a `#` inside a character constant is not the operator"),
+    nm("20.10", "a.c", "#define A 1 /* #1 */\n", "a `#` inside a comment is not the operator"),
+    nm("D4.9", "a.c", "#define ALLOC(T) ((T *)malloc(sizeof(T)))\n", "a parameter used as `(T *)` is a type, which no function can take"),
 ];
 
 /// Near-misses for the Rust checks.

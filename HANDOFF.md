@@ -294,6 +294,71 @@ Known limits:
 * 12.3 cannot see a typedef-name cast;
 * 21.3 has the same call-only gap that Dir 4.12 had.
 
+**A third and a fourth pass, after 1.0.1, found more in both directions.** These
+fixes are on `master` and in no release yet; 1.0.1 still behaves the old way.
+
+False positives fixed:
+* 15.2 matched a `goto` to a label of the same name in any function, and now looks
+  only in its own function, by position, so the same line counts too;
+* 17.10 fired on `_Noreturn static inline void`, `void _Noreturn`, and on the word
+  inside `__attribute__((noreturn))` and `[[noreturn]]` before a void function;
+* 8.10 missed `static` with an attribute between it and `inline`;
+* Dir 4.10 did not take `#if !defined(X)` then `#define X` as a guard;
+* 11.10 fired on `_Atomic(void *)`;
+* 20.1 counted the contents of a literal `#if 0`; `#if FOO` still counts, because
+  nothing here evaluates it;
+* 6.2 fired on a ternary anywhere in a function, and now reads only struct and
+  union bodies;
+* 8.16 fired on `alignas(0 + 16)`, and now reads a bare literal only;
+* 20.10 fired on a `#` in a string, a character constant or a comment;
+* Dir 4.9 fired on a macro using a parameter as `(T *)`, which no function can take.
+
+Misses fixed:
+* 17.10 on `_Noreturn void *f`;
+* 6.3 on a width written as a macro or in parentheses;
+* 8.2 on a lone typedef name or struct tag as a parameter, on prototypes inside a
+  function, and on old-style definitions with their declarations;
+* 16.6 on `case 1: case 2:` counted as two clauses, which is one;
+* 17.1 on the `__builtin_va_*` spellings;
+* 2.6 on a label whose only `goto` is in another function;
+* 20.14 on a second `#else`, or an `#elif` after one;
+* 8.16 on `alignas(0u)`;
+* 20.10 on the digraphs `%:` and `%:%:`.
+
+The message for 5.4 said 31 significant characters; the check compares 63, which is
+right for a macro name, and now the message says so.
+
+**A batch reviewed only against its own cases is not reviewed.** The agent that
+wrote the first batch reported no difference on real C, and that was true. The tree
+just held none of these shapes. Reading the diff and probing what it touched found
+one regression (a bit-field in a doubly nested anonymous struct in a union lost
+6.3) and new false positives on `__declspec(noreturn)`, `int f(VOID);`,
+`int f(PARAMS);`, `static DEFINE_MUTEX(lock);` and macros on members or locals.
+All are fixed, each with a fixture or a near-miss. That corpus also has no `#if 0`,
+`__builtin_va_*`, block-scope prototype, old-style definition, or `alignas(0...)`,
+so those fixes rest on their fixtures alone. Assimp and CMake's modules were not
+on hand for this comparison, which used the repository's C and the npm cache's.
+
+Candidates left alone, on purpose:
+* 4.1 on `"\x41G"` and `"\x41 "`. An audit agent called these false positives. As
+  I recall, the guideline's own examples count this form as a violation, so the
+  check stands. Compare it with the licensed text;
+* 20.7 on `(a)[i]`, 20.11 on `a ## #b` and 7.6 on `INT32_C`, because whether the
+  guideline reaches them cannot be settled without the licensed text;
+* 5.5 on an exact name, and 21.x on a function taken by value, because they need
+  scope analysis;
+* 8.2 on a parameter nested inside a function-pointer parameter;
+* 21.12 on `fegetround`, as above.
+
+New known limits:
+* 8.2 reads an all-capitals or `__` word as a macro, so `int f(UINT8);` is silent;
+* 8.2 reads block-scope prototypes only after a declaration keyword, so one led by
+  a typedef name is not read, and `name(a) {` with no declarations is not judged;
+* 17.10 leaves a bare-identifier return type undecided, and does not read a return
+  type written before the specifier or a trailing attribute: `int _Noreturn f(void);`
+  and `int f(void) __attribute__((noreturn));` are silent;
+* 20.14 still does not report a stray `#else` with no open conditional.
+
 **Release mechanics for the next version:** bump the version in
 `Cargo.toml`, `gui/src-tauri/Cargo.toml`, `gui/src-tauri/tauri.conf.json`,
 `gui/package.json`, `gui/package-lock.json` and both `Cargo.lock`s, and in the

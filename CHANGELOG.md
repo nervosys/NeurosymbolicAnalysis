@@ -9,6 +9,35 @@ must read exactly `## [<version>]`.
 
 ## [Unreleased]
 
+MISRA C findings change in both directions, so a baseline taken on 1.0.1 may need
+refreshing.
+
+### Fixed
+- False positives no longer reported:
+  - 15.2 for a label of the same name in another function
+  - 17.10 for `_Noreturn static inline void`, `void _Noreturn`, and void functions
+    marked `__attribute__((noreturn))` or `[[noreturn]]`
+  - 8.10 with an attribute between `static` and `inline`
+  - Dir 4.10 for an `#if !defined(X)` guard
+  - 11.10 for `_Atomic(void *)`
+  - 20.1 for the contents of `#if 0`
+  - 6.2 for a ternary in a function
+  - 8.16 for `alignas(0 + 16)`
+  - 20.10 for a `#` in a string, character constant or comment
+  - Dir 4.9 for a macro that uses a parameter as `(T *)`
+- Violations now reported:
+  - 17.10 for `_Noreturn void *f`
+  - 6.3 for a width written as a macro or in parentheses
+  - 8.2 for a lone typedef name or struct tag as a parameter, prototypes inside a
+    function, and old-style definitions
+  - 16.6 for `case 1: case 2:` with no other clause
+  - 17.1 for the `__builtin_va_*` spellings
+  - 2.6 for a label whose only `goto` is in another function
+  - 20.14 for a second `#else`, or an `#elif` after one
+  - 8.16 for `alignas(0u)`
+  - 20.10 for the digraphs `%:` and `%:%:`
+- The 5.4 message said 31 significant characters where the check compares 63.
+
 ## [1.0.1] - 2026-11-04
 
 The same code as 1.0.0, built by the release workflow rather than on one machine.

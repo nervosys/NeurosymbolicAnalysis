@@ -220,6 +220,37 @@ fn is_type_qualifier(token: &str) -> bool {
     matches!(token, "const" | "volatile" | "restrict" | "__restrict" | "_Atomic")
 }
 
+/// A directive's condition or argument with any trailing comment removed.
+fn directive_condition(body: &str) -> &str {
+    let body = body.split("//").next().unwrap_or(body);
+    body.split("/*").next().unwrap_or(body).trim()
+}
+
+/// The macro named by a condition of the form `!defined(X)` or `!defined X`,
+/// when that is the whole condition. Anything more (`&& Y`, `!defined(X) || Z`)
+/// is not a guard and is not read as one.
+fn negated_defined_name(body: &str) -> Option<&str> {
+    let is_name_byte = |c: char| c.is_ascii_alphanumeric() || c == '_';
+    let rest = directive_condition(body).strip_prefix('!')?.trim_start();
+    let rest = rest.strip_prefix("defined")?;
+    if rest.starts_with(is_name_byte) {
+        return None; // `definedX` is some other word
+    }
+    let rest = rest.trim_start();
+    let (name, tail) = match rest.strip_prefix('(') {
+        Some(inner) => {
+            let inner = inner.trim_start();
+            let end = inner.find(|c| !is_name_byte(c)).unwrap_or(inner.len());
+            (&inner[..end], inner[end..].trim_start().strip_prefix(')')?)
+        }
+        None => {
+            let end = rest.find(|c| !is_name_byte(c)).unwrap_or(rest.len());
+            (&rest[..end], &rest[end..])
+        }
+    };
+    (!name.is_empty() && tail.trim().is_empty()).then_some(name)
+}
+
 /// Characters that are typographically confusable, collapsed to a canonical
 /// form so `l1I` and `O0` style collisions can be found (D4.5).
 fn ambiguity_key(ident: &str) -> String {
@@ -632,6 +663,14 @@ struct Cx<'a> {
     provider: &'static str,
     dialect: Dialect,
     findings: Vec<Finding>,
+}
+
+/// What a `{` opens, as far as the bit-field rule cares.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum BodyKind {
+    Union,
+    Struct,
+    Other,
 }
 
 /// What `check_switches` needs to know about one `switch`, copied out of the
@@ -1124,7 +1163,7 @@ impl<'a> Cx<'a> {
                 col,
                 format!(
                     "macro `{name}` is not distinct from `{previous}` (line {prev_line}) within \
-                     the first 31 significant characters, which is all a conforming preprocessor \
+                     the first 63 significant characters, which is all a conforming preprocessor \
                      must consider"
                 ),
             );
@@ -1214,6 +1253,7 @@ impl<'a> Cx<'a> {
                     if is_keyword(&n, self.lexed.dialect) {
                         self.emit_with("20.4", line, col, format!("macro `{n}` has the same name as a keyword, so the language itself changes meaning wherever this header is included"), Severity::High);
                     }
+                    let operators = macro_operators(&body);
                     if function_like {
                         // D4.9 asks for a function "where they are
                         // interchangeable". A replacement list using `#` or `##`
@@ -1225,29 +1265,25 @@ impl<'a> Cx<'a> {
                         // something the language cannot express.
                         //
                         // The construct is still reported, by 20.10, which is
-                        // the guideline that actually covers `#` and `##`. The
-                        // test is `body.contains('#')` because that is exactly
-                        // what 20.10 asks, so the two cannot disagree about what
-                        // a stringising macro is. Both share its imprecision: a
-                        // `#` inside a string literal in the replacement list
-                        // reads as the operator. That direction only loses a
-                        // D4.9, and 20.10 already had the same blind spot.
+                        // the guideline that actually covers `#` and `##`. Both
+                        // read the same `operators`, so they cannot disagree about
+                        // what a stringising macro is.
                         //
                         // The same goes for a parameter naming the type of a
                         // compound literal: a function cannot take a type.
-                        if !body.contains('#') && !parameter_is_a_type(&body) {
+                        if !operators.contains('#') && !parameter_is_a_type(&body) {
                             self.emit("D4.9", line, col, format!("function-like macro `{n}` — a function or, in C++, a template gives the same result with type checking and a debuggable call frame"));
                         }
                         if let Some(param) = unparenthesized_parameter(&body) {
                             self.emit("20.7", line, col, format!("parameter `{param}` of macro `{n}` is used without enclosing parentheses, so an argument that is an expression will bind wrongly at the call site"));
                         }
                     }
-                    if body.contains("##") {
+                    if operators.contains("##") {
                         self.emit("20.10", line, col, format!("macro `{n}` uses the `##` token-pasting operator; the result is unreadable and its evaluation order is a common defect source"));
-                        if pastes_adjacent_to_stringize(&body) {
+                        if pastes_adjacent_to_stringize(&operators) {
                             self.emit("20.11", line, col, format!("macro `{n}` applies `#` and `##` to adjacent parameters, whose evaluation order is unspecified"));
                         }
-                    } else if body.contains('#') {
+                    } else if operators.contains('#') {
                         self.emit("20.10", line, col, format!("macro `{n}` uses the `#` stringizing operator"));
                     }
                 }
@@ -1264,6 +1300,12 @@ impl<'a> Cx<'a> {
         for (line, col) in unbalanced {
             self.emit_with("20.14", line, col, "conditional compilation directive has no matching partner in this file", Severity::High);
         }
+        // A second `#else`, or an `#elif` after one, at the same level.
+        let after_else: Vec<(u32, u32)> =
+            self.st.after_else.iter().map(|p| (p.line, p.column)).collect();
+        for (line, col) in after_else {
+            self.emit_with("20.14", line, col, "conditional compilation directive follows the `#else` of its own level; a conditional takes one `#else`, last", Severity::High);
+        }
 
         // D4.10: a header must not be includable twice.
         if self.is_header() && !self.has_include_guard() {
@@ -1276,20 +1318,52 @@ impl<'a> Cx<'a> {
         }
     }
 
+    /// Inclusive line ranges of `#if 0` groups, which the preprocessor never
+    /// compiles.
+    ///
+    /// Only the literal `0` is decided here. `#if FOO` stays code: whether it is
+    /// live depends on a macro this pass does not evaluate, and guessing would
+    /// hide real code. A group ends at the first `#elif`, `#else` or `#endif` at
+    /// its own level, since the branch after that is live or undecided.
+    fn literal_false_lines(&self) -> Vec<(u32, u32)> {
+        use sda_syntax::DirectiveKind as D;
+        let ds = &self.st.directives;
+        let mut out = Vec::new();
+        for (i, d) in ds.iter().enumerate() {
+            if d.kind != D::If || directive_condition(&d.body) != "0" {
+                continue;
+            }
+            let end = ds[i + 1..]
+                .iter()
+                .find(|e| {
+                    e.depth == d.depth && (e.kind.continues_conditional() || e.kind.closes_conditional())
+                })
+                .map_or(u32::MAX, |e| e.pos.line);
+            out.push((d.pos.line, end));
+        }
+        out
+    }
+
     fn has_include_guard(&self) -> bool {
         use sda_syntax::DirectiveKind as D;
         if self.st.directives.iter().any(|d| d.kind == D::Pragma && d.body.contains("once")) {
             return true;
         }
-        // The classic form: `#ifndef X` followed by `#define X`.
+        // The classic form: `#ifndef X` followed by `#define X`, and the
+        // equivalent `#if !defined(X)` / `#if !defined X` followed by `#define X`.
         let mut it = self.st.directives.iter();
         while let Some(d) = it.next() {
-            if d.kind == D::Ifndef {
-                let guard = d.body.split_whitespace().next().unwrap_or("");
-                if let Some(next) = it.next()
-                    && next.kind == D::Define && next.name.as_deref() == Some(guard) {
-                        return true;
-                    }
+            let guard = match d.kind {
+                D::Ifndef => d.body.split_whitespace().next(),
+                D::If => negated_defined_name(&d.body),
+                _ => None,
+            };
+            if let Some(guard) = guard
+                && let Some(next) = it.next()
+                && next.kind == D::Define
+                && next.name.as_deref() == Some(guard)
+            {
+                return true;
             }
         }
         false
@@ -1347,12 +1421,16 @@ impl<'a> Cx<'a> {
             }
         }
 
-        // 20.1: includes must come first.
-        if let Some(first_code) = self.code.first() {
+        // 20.1: includes must come first. Code the preprocessor never compiles
+        // (an `#if 0` group) is not code for this purpose, so it neither counts
+        // as the code an include must precede nor holds an include to account.
+        let dead = self.literal_false_lines();
+        let live = |line: u32| !dead.iter().any(|(a, b)| (*a..=*b).contains(&line));
+        if let Some(first_code) = self.code.iter().find(|t| live(t.pos.line)) {
             let offenders: Vec<(u32, u32)> = self
                 .st
                 .includes()
-                .filter(|d| d.pos.line > first_code.pos.line)
+                .filter(|d| live(d.pos.line) && d.pos.line > first_code.pos.line)
                 .map(|d| (d.pos.line, d.pos.column))
                 .collect();
             for (line, col) in offenders {
@@ -1393,7 +1471,11 @@ impl<'a> Cx<'a> {
                     "a union reads one member as another's bit pattern, which is implementation-defined and defeats type-based reasoning".into(),
                 )),
                 // 17.1
-                "va_list" | "va_start" | "va_arg" | "va_end" | "va_copy" => hits.push((
+                // The `__builtin_` spellings are what the variadic macros of
+                // <stdarg.h> expand to on GCC and Clang.
+                "va_list" | "va_start" | "va_arg" | "va_end" | "va_copy"
+                | "__builtin_va_list" | "__builtin_va_start" | "__builtin_va_arg"
+                | "__builtin_va_end" | "__builtin_va_copy" => hits.push((
                     "17.1",
                     line,
                     col,
@@ -1401,10 +1483,7 @@ impl<'a> Cx<'a> {
                 )),
                 // 8.10: an inline function must be static.
                 "inline" => {
-                    let has_static = (i.saturating_sub(3)..i + 4)
-                        .filter(|k| *k < n)
-                        .any(|k| self.tok(k) == "static" || self.tok(k) == "extern");
-                    if !has_static {
+                    if !self.has_linkage_specifier(i) {
                         hits.push((
                             "8.10",
                             line,
@@ -1415,8 +1494,10 @@ impl<'a> Cx<'a> {
                 }
                 // 17.10: _Noreturn must have void return type.
                 "_Noreturn" | "noreturn" => {
-                    let returns_void = (i + 1..(i + 3).min(n)).any(|k| self.tok(k) == "void");
-                    if !returns_void {
+                    // Only a return type that is decidably not `void` is a
+                    // finding. A typedef name might name `void`, so it is left
+                    // alone rather than guessed at.
+                    if self.noreturn_returns_non_void(i) {
                         hits.push((
                             "17.10",
                             line,
@@ -1427,7 +1508,14 @@ impl<'a> Cx<'a> {
                 }
                 // 8.16 / 8.17: alignment specifiers.
                 "alignas" | "_Alignas" => {
-                    if i + 2 < n && self.tok(i + 1) == "(" && self.tok(i + 2) == "0" {
+                    // Only a bare integer literal is read. `alignas(0 + 16)` is
+                    // not judged: its value is not in the tokens.
+                    if i + 3 < n
+                        && self.tok(i + 1) == "("
+                        && self.code[i + 2].kind == CTokenKind::Number
+                        && self.tok(i + 3) == ")"
+                        && integer_literal_value(self.tok(i + 2)) == Some(0)
+                    {
                         hits.push(("8.16", line, col, "an alignment specification of zero has no effect and is almost certainly a mistake".into()));
                     }
                     // Stops at the end of the declaration: the next one along
@@ -1526,7 +1614,14 @@ impl<'a> Cx<'a> {
                 )),
                 // 11.10: `_Atomic` may not be applied to `void`.
                 "_Atomic" => {
-                    if i + 2 < n && self.tok(i + 1) == "(" && self.tok(i + 2) == "void" {
+                    // `_Atomic(void)` exactly. `_Atomic(void *)` qualifies a
+                    // pointer, which is complete, so the closing paren must
+                    // follow the `void` directly.
+                    if i + 3 < n
+                        && self.tok(i + 1) == "("
+                        && self.tok(i + 2) == "void"
+                        && self.tok(i + 3) == ")"
+                    {
                         hits.push((
                             "11.10",
                             line,
@@ -1581,7 +1676,7 @@ impl<'a> Cx<'a> {
             if f.name.starts_with("__") {
                 continue;
             }
-            if let Some(why) = prototype_fault(&f.params) {
+            if let Some(why) = prototype_fault(&f.name, &f.params) {
                 hits.push((
                     "8.2",
                     f.pos.line,
@@ -1591,9 +1686,27 @@ impl<'a> Cx<'a> {
             }
         }
         for (name, pos, params) in self.file_scope_declarations() {
-            if let Some(why) = prototype_fault(&params) {
+            if let Some(why) = prototype_fault(&name, &params) {
                 hits.push(("8.2", pos.line, pos.column, format!("`{name}` {why}")));
             }
+        }
+        // Prototypes inside a function body are declarations too. A struct body
+        // also sits at nonzero depth, but a member's declarator is not a prototype.
+        for (name, pos, params) in self.block_scope_declarations() {
+            if self.function_scope_of(pos.line, pos.column).is_none() {
+                continue;
+            }
+            if let Some(why) = prototype_fault(&name, &params) {
+                hits.push(("8.2", pos.line, pos.column, format!("`{name}` {why}")));
+            }
+        }
+        for (name, pos) in self.kr_definitions() {
+            hits.push((
+                "8.2",
+                pos.line,
+                pos.column,
+                format!("`{name}` is defined with an old-style identifier list and separate parameter declarations; give each parameter its type in prototype form"),
+            ));
         }
 
         // 6.3 / 6.2: bit-fields.
@@ -1619,6 +1732,222 @@ impl<'a> Cx<'a> {
         }
     }
 
+    /// Whether the declaration that `inline` at `at` belongs to says `static` or
+    /// `extern` among its specifiers, in any order.
+    ///
+    /// Read back to the start of the declaration, so an attribute between the
+    /// two (`static __attribute__((unused)) inline`) is no obstacle; forward a
+    /// few tokens for `inline static`.
+    fn has_linkage_specifier(&self, at: usize) -> bool {
+        let mut k = at;
+        while k > 0 {
+            k -= 1;
+            match self.tok(k) {
+                ";" | "{" | "}" => break,
+                "static" | "extern" => return true,
+                _ => {}
+            }
+        }
+        (at + 1..(at + 6).min(self.code.len()))
+            .take_while(|k| !matches!(self.tok(*k), ";" | "{" | "}" | "(" | "="))
+            .any(|k| matches!(self.tok(k), "static" | "extern"))
+    }
+
+    /// Whether the function declared with `_Noreturn` at `at` has a return type
+    /// that is decidably something other than `void`.
+    ///
+    /// The specifiers and attributes before the return type are skipped, and the
+    /// declarator's name is the last word before its parameter list. A return
+    /// type that is one bare identifier is a typedef name, which may name
+    /// `void`; that is not decided here, so it is not a finding.
+    fn noreturn_returns_non_void(&self, at: usize) -> bool {
+        const SPECIFIERS: &[&str] = &[
+            "static", "extern", "inline", "_Noreturn", "noreturn", "__inline", "__inline__",
+            "__forceinline", "_Thread_local", "__extension__",
+        ];
+        let n = self.code.len();
+        let mut words: Vec<usize> = Vec::new();
+        let mut k = at + 1;
+        // `noreturn` may be the word inside `__attribute__((noreturn))`,
+        // `__declspec(noreturn)` or `[[noreturn]]`; what it qualifies starts after
+        // the closing brackets. A trailing attribute then meets `;` or `{` with no
+        // words read, which decides nothing.
+        while k < n && matches!(self.tok(k), ")" | "]") {
+            k += 1;
+        }
+        let mut stop = None;
+        while k < n {
+            let t = self.tok(k);
+            if SPECIFIERS.contains(&t) {
+                k += 1;
+                continue;
+            }
+            if matches!(t, "__attribute__" | "__attribute" | "__declspec" | "alignas" | "_Alignas")
+                && k + 1 < n
+                && self.tok(k + 1) == "("
+            {
+                match cstruct::matching(self.src, &self.code, k + 1, "(", ")") {
+                    Some(close) => k = close + 1,
+                    None => break,
+                }
+                continue;
+            }
+            if t == "[" && k + 1 < n && self.tok(k + 1) == "[" {
+                match cstruct::matching(self.src, &self.code, k, "[", "]") {
+                    Some(close) => k = close + 1,
+                    None => break,
+                }
+                continue;
+            }
+            if matches!(t, ";" | "{" | "}" | "(" | "=" | ",") {
+                stop = Some(t);
+                break;
+            }
+            words.push(k);
+            k += 1;
+        }
+        // No parameter list ahead means this is not a function being declared:
+        // `noreturn` is an ordinary identifier to code without <stdnoreturn.h>.
+        if stop != Some("(") {
+            return false;
+        }
+        let Some(&last) = words.last() else { return false };
+        let named = self.code[last].kind == CTokenKind::Identifier;
+        let ret: Vec<&str> = words[..words.len() - usize::from(named)]
+            .iter()
+            .map(|&w| self.tok(w))
+            .filter(|w| !matches!(*w, "const" | "volatile"))
+            .collect();
+        match ret.as_slice() {
+            [] | ["void"] => false,
+            [single] => BASIC_RETURN_WORDS.contains(single) || *single == "*",
+            _ => true,
+        }
+    }
+
+    /// Function declarations inside a function body: `;`-terminated runs at a
+    /// nonzero brace depth that begin with a declaration specifier.
+    ///
+    /// A run that begins with anything else is a statement, so `g(a, b);` is a
+    /// call and not a prototype, while `int older(int, int);` is a declaration.
+    fn block_scope_declarations(&self) -> Vec<(String, sda_syntax::Pos, String)> {
+        let mut out = Vec::new();
+        let mut depth = 0i32;
+        let mut start = 0usize;
+        let n = self.code.len();
+        for i in 0..n {
+            match self.tok(i) {
+                "{" => {
+                    depth += 1;
+                    start = i + 1;
+                }
+                "}" => {
+                    depth -= 1;
+                    start = i + 1;
+                }
+                ";" => {
+                    if depth > 0 && i > start && DECLARATION_HEADS.contains(&self.tok(start)) {
+                        self.read_prototype(start, i, &mut out);
+                    }
+                    start = i + 1;
+                }
+                _ => {}
+            }
+        }
+        out
+    }
+
+    /// Old-style (K&R) function definitions: `name ( identifier-list )
+    /// declaration... {` at file scope.
+    ///
+    /// Reported only when every part of that shape is present: a return type
+    /// before the name, bare identifiers in the parentheses, a declaration
+    /// after `)` that opens with a type keyword, a `{` that follows those
+    /// declarations, and a declaration in that run for every listed name. A
+    /// macro invocation such as `FOO(a) int a; {` has none of this shape in
+    /// practice, and `name(a) {` with no declarations is not decided here.
+    fn kr_definitions(&self) -> Vec<(String, sda_syntax::Pos)> {
+        const DECLARATION_OPENERS: &[&str] = &[
+            "void", "char", "short", "int", "long", "float", "double", "signed", "unsigned",
+            "_Bool", "struct", "union", "enum", "const", "volatile", "register",
+        ];
+        let n = self.code.len();
+        let mut out = Vec::new();
+        let mut depth = 0i32;
+        for i in 0..n {
+            match self.tok(i) {
+                "{" => depth += 1,
+                "}" => depth -= 1,
+                _ => {}
+            }
+            if depth != 0 || i == 0 || self.code[i].kind != CTokenKind::Identifier {
+                continue;
+            }
+            if i + 2 >= n || self.tok(i + 1) != "(" {
+                continue;
+            }
+            let prev = self.code[i - 1];
+            if !(matches!(prev.kind, CTokenKind::Identifier | CTokenKind::Keyword)
+                || prev.is(self.src, "*"))
+            {
+                continue;
+            }
+            let Some(close) = cstruct::matching(self.src, &self.code, i + 1, "(", ")") else {
+                continue;
+            };
+            // The identifier list: names separated by single commas, at least one.
+            let inner: Vec<usize> = (i + 2..close).collect();
+            if inner.is_empty() || inner.len().is_multiple_of(2) {
+                continue;
+            }
+            let mut names: Vec<&str> = Vec::new();
+            let mut well_formed = true;
+            for (pos, &k) in inner.iter().enumerate() {
+                if pos % 2 == 0 {
+                    if self.code[k].kind != CTokenKind::Identifier {
+                        well_formed = false;
+                        break;
+                    }
+                    names.push(self.tok(k));
+                } else if self.tok(k) != "," {
+                    well_formed = false;
+                    break;
+                }
+            }
+            if !well_formed || close + 1 >= n || !DECLARATION_OPENERS.contains(&self.tok(close + 1)) {
+                continue;
+            }
+            // Declarations run to a `{` at the parameter list's level; a `}` first
+            // means there was no body.
+            let mut body = None;
+            let mut nest = 0i32;
+            for k in close + 1..n {
+                match self.tok(k) {
+                    "(" | "[" => nest += 1,
+                    ")" | "]" => nest -= 1,
+                    "{" if nest == 0 => {
+                        body = Some(k);
+                        break;
+                    }
+                    "}" => break,
+                    _ => {}
+                }
+            }
+            let Some(body) = body else { continue };
+            if body == 0 || self.tok(body - 1) != ";" {
+                continue;
+            }
+            let declared = |name: &str| {
+                (close + 1..body)
+                    .any(|m| self.code[m].kind == CTokenKind::Identifier && self.tok(m) == name)
+            };
+            if names.iter().all(|nm| declared(nm)) {
+                out.push((self.tok(i).to_string(), self.code[i].pos));
+            }
+        }
+        out
+    }
+
     /// Whether the `{` at `open` closes on `};`, which makes the struct anonymous.
     fn closes_with_no_declarator(&self, open: usize) -> bool {
         let mut depth = 0i32;
@@ -1640,50 +1969,81 @@ impl<'a> Cx<'a> {
     /// Bit-field checks: a single-bit signed field cannot hold the value 1, and
     /// a bit-field in a union has no defined layout at all.
     ///
+    /// A bit-field is a `:` directly inside a struct or union body, after a member
+    /// name (or a type, for an unnamed one), and ended by `;` or `,`. Anything
+    /// else with a colon, a ternary, a label, a `case`, a designator, is not one.
+    /// The width is any constant expression, so `WIDTH` and `(2)` count; only a
+    /// width of exactly `1` is read for the signed rule.
+    ///
     /// "In a union" means a member of it. A bit-field in a named struct inside a
     /// union belongs to that struct, while one in an anonymous struct counts as
     /// a member of the union, which is what C says of anonymous members.
     fn bitfield_findings(&self) -> Vec<(&'static str, u32, u32, String)> {
         let mut out = Vec::new();
         let n = self.code.len();
-        // The brace depth of each open union body, innermost last.
-        let mut unions: Vec<i32> = Vec::new();
-        let mut depth = 0i32;
+        // What each open `{` opened, and whether its members are union members.
+        let mut bodies: Vec<(BodyKind, bool)> = Vec::new();
 
         for i in 0..n {
             let t = self.tok(i);
             match t {
-                "{" => depth += 1,
+                "{" => {
+                    let (kind, anonymous) = self.body_kind_before(i);
+                    // Members of a union, or of an anonymous struct that is itself one.
+                    let inside_union = bodies.last().is_some_and(|(_, member)| *member);
+                    let member = match kind {
+                        BodyKind::Union => true,
+                        BodyKind::Struct => {
+                            anonymous && inside_union && self.closes_with_no_declarator(i)
+                        }
+                        BodyKind::Other => false,
+                    };
+                    bodies.push((kind, member));
+                }
                 "}" => {
-                    if unions.last() == Some(&depth) {
-                        unions.pop();
-                    }
-                    depth -= 1;
-                }
-                // `union U *p;` names a union and opens nothing.
-                "union" if i + 1 < n
-                    && (self.tok(i + 1) == "{"
-                        || (i + 2 < n && self.tok(i + 2) == "{")) =>
-                {
-                    unions.push(depth + 1);
-                }
-                "struct" if i + 1 < n
-                    && self.tok(i + 1) == "{"
-                    && unions.last() == Some(&depth)
-                    && self.closes_with_no_declarator(i + 1) =>
-                {
-                    unions.push(depth + 1);
+                    bodies.pop();
                 }
                 ":" => {
-                    // A bit-field declarator: `type name : width ;`
-                    let is_bitfield = i + 2 < n
-                        && self.code[i + 1].kind == CTokenKind::Number
-                        && (self.tok(i + 2) == ";" || self.tok(i + 2) == ",");
-                    if !is_bitfield {
+                    let Some(&(kind, member)) = bodies.last() else { continue };
+                    if kind == BodyKind::Other || i == 0 {
                         continue;
                     }
+                    // The name of a member, or the type of an unnamed bit-field.
+                    let before = self.code[i - 1];
+                    let names_a_member = before.kind == CTokenKind::Identifier
+                        || matches!(
+                            before.text(self.src),
+                            "int" | "unsigned" | "signed" | "_Bool" | "bool" | "char" | "short" | "long"
+                        );
+                    if !names_a_member {
+                        continue;
+                    }
+                    // The width runs to the `;` or `,` that ends the member.
+                    let mut end = None;
+                    let mut nest = 0i32;
+                    for k in i + 1..n {
+                        match self.tok(k) {
+                            "(" | "[" => nest += 1,
+                            ")" | "]" => {
+                                nest -= 1;
+                                if nest < 0 {
+                                    break;
+                                }
+                            }
+                            ";" | "," if nest == 0 => {
+                                end = Some(k);
+                                break;
+                            }
+                            "{" | "}" | "?" | ":" => break,
+                            _ => {}
+                        }
+                    }
+                    let Some(end) = end else { continue };
+                    if end == i + 1 {
+                        continue; // `name : ;` has no width
+                    }
                     let (line, col) = self.pos_of(i);
-                    if unions.last() == Some(&depth) {
+                    if member {
                         out.push((
                             "6.3",
                             line,
@@ -1691,7 +2051,7 @@ impl<'a> Cx<'a> {
                             "a bit-field inside a union has no portable layout; where its bits land is entirely up to the implementation".to_string(),
                         ));
                     }
-                    if self.tok(i + 1) == "1" {
+                    if end == i + 2 && self.tok(i + 1) == "1" {
                         // Walk back to the declaration's base type.
                         let start = (0..i).rev().find(|k| matches!(self.tok(*k), ";" | "{" | "}"));
                         let from = start.map(|s| s + 1).unwrap_or(0);
@@ -1711,6 +2071,62 @@ impl<'a> Cx<'a> {
             }
         }
         out
+    }
+
+    /// What the `{` at `open` opens: a struct or union body, or anything else,
+    /// and whether it is anonymous (`struct {`, `union {`).
+    ///
+    /// Read back from the brace to the start of its declaration. An attribute
+    /// group between the keyword and the brace (`struct __attribute__((packed))
+    /// S {`) is stepped over; any other parenthesis, `=`, or statement boundary
+    /// ends the search, so a function body or an initializer is `Other`.
+    fn body_kind_before(&self, open: usize) -> (BodyKind, bool) {
+        let anonymous = open > 0 && matches!(self.tok(open - 1), "struct" | "union");
+        let mut words: Vec<&str> = Vec::new();
+        let mut k = open;
+        while k > 0 {
+            k -= 1;
+            match self.tok(k) {
+                ";" | "{" | "}" | "=" | "," | "(" => break,
+                ")" => {
+                    // Find the `(` this `)` closes, then the word before it.
+                    let mut depth = 0i32;
+                    let mut o = k;
+                    loop {
+                        match self.tok(o) {
+                            ")" => depth += 1,
+                            "(" => {
+                                depth -= 1;
+                                if depth == 0 {
+                                    break;
+                                }
+                            }
+                            _ => {}
+                        }
+                        if o == 0 {
+                            return (BodyKind::Other, anonymous);
+                        }
+                        o -= 1;
+                    }
+                    if o > 0 && matches!(self.tok(o - 1), "__attribute__" | "__attribute" | "__declspec") {
+                        k = o;
+                    } else {
+                        break;
+                    }
+                }
+                w => words.push(w),
+            }
+        }
+        let kind = words
+            .iter()
+            .find_map(|w| match *w {
+                "struct" => Some(BodyKind::Struct),
+                "union" => Some(BodyKind::Union),
+                "enum" => Some(BodyKind::Other),
+                _ => None,
+            })
+            .unwrap_or(BodyKind::Other);
+        (kind, anonymous)
     }
 
     // --- control flow -----------------------------------------------------
@@ -1909,7 +2325,7 @@ impl<'a> Cx<'a> {
                     s.pos.line,
                     s.pos.column,
                     s.has_default,
-                    s.case_count,
+                    s.clauses,
                     s.default_not_last,
                     s.fallthrough_clauses.iter().map(|p| (p.line, p.column)).collect(),
                     s.misplaced_labels.iter().map(|p| (p.line, p.column)).collect(),
@@ -1917,7 +2333,7 @@ impl<'a> Cx<'a> {
             })
             .collect();
 
-        for (line, col, has_default, cases, default_not_last, fallthrough, misplaced) in switches {
+        for (line, col, has_default, clauses, default_not_last, fallthrough, misplaced) in switches {
             if !has_default {
                 self.emit(
                     "16.4",
@@ -1934,7 +2350,6 @@ impl<'a> Cx<'a> {
                     "the `default` label is neither first nor last; a reader scanning for the catch-all has to read every clause to find it",
                 );
             }
-            let clauses = cases + usize::from(has_default);
             if clauses < 2 {
                 self.emit(
                     "16.6",
@@ -1964,21 +2379,51 @@ impl<'a> Cx<'a> {
 
     // --- jumps ------------------------------------------------------------
 
-    fn check_jumps(&mut self) {
-        let gotos: Vec<(String, u32, u32)> =
-            self.st.gotos.iter().map(|(n, p)| (n.clone(), p.line, p.column)).collect();
-        let labels: Vec<(String, u32)> =
-            self.st.labels.iter().map(|(n, p)| (n.clone(), p.line)).collect();
+    /// The index of the function whose body contains `line:column`, if any.
+    ///
+    /// A label's name is only in scope in its own function (C23 6.8.1), so a
+    /// `goto` and a label are matched only when they share one of these. Code
+    /// outside every body this analyzer read maps to `None`, and `None` matches
+    /// only `None`.
+    fn function_scope_of(&self, line: u32, column: u32) -> Option<usize> {
+        let at = (line, column);
+        self.st.functions.iter().position(|f| {
+            let start = self.lexed.lines.pos(f.body.start);
+            let end = self.lexed.lines.pos(f.body.end);
+            (start.line, start.column) <= at && at <= (end.line, end.column)
+        })
+    }
 
-        for (target, line, col) in gotos {
+    fn check_jumps(&mut self) {
+        // (name, line, column, enclosing function)
+        let gotos: Vec<(String, u32, u32, Option<usize>)> = self
+            .st
+            .gotos
+            .iter()
+            .map(|(n, p)| (n.clone(), p.line, p.column, self.function_scope_of(p.line, p.column)))
+            .collect();
+        // (name, line, column, enclosing function)
+        let labels: Vec<(String, u32, u32, Option<usize>)> = self
+            .st
+            .labels
+            .iter()
+            .map(|(n, p)| (n.clone(), p.line, p.column, self.function_scope_of(p.line, p.column)))
+            .collect();
+
+        for (target, line, col, scope) in &gotos {
+            let (line, col) = (*line, *col);
             self.emit(
                 "15.1",
                 line,
                 col,
                 format!("`goto {target}` — unrestricted jumps make a function's control flow something you have to simulate rather than read"),
             );
-            if let Some((_, label_line)) = labels.iter().find(|(n, _)| *n == target)
-                && *label_line < line {
+            // The label is looked up in the function the `goto` sits in, not
+            // file-wide: a forward jump to `done:` in a second function is not a
+            // backward jump just because the first function had its own `done:`.
+            if let Some((_, label_line, label_col, _)) =
+                labels.iter().find(|(n, _, _, s)| n == target && s == scope)
+                && (*label_line, *label_col) < (line, col) {
                     self.emit(
                         "15.2",
                         line,
@@ -1988,13 +2433,14 @@ impl<'a> Cx<'a> {
                 }
         }
 
-        // 2.6: a label nothing jumps to.
-        let unused: Vec<(String, u32)> = self
-            .st
-            .labels
+        // 2.6: a label nothing jumps to. Matched within its own function, so a
+        // `goto unused;` in another function does not count.
+        let unused: Vec<(String, u32)> = labels
             .iter()
-            .filter(|(name, _)| !self.st.gotos.iter().any(|(t, _)| t == name))
-            .map(|(name, p)| (name.clone(), p.line))
+            .filter(|(name, _, _, scope)| {
+                !gotos.iter().any(|(t, _, _, gs)| t == name && gs == scope)
+            })
+            .map(|(name, line, _, _)| (name.clone(), *line))
             .collect();
         for (name, line) in unused {
             self.emit(
@@ -3197,7 +3643,7 @@ fn banned_message(name: &str, rule: &str) -> String {
 ///
 /// MISRA 8.2 asks for prototype form *with named parameters*, and the two
 /// failures read differently to whoever has to fix them.
-fn prototype_fault(params: &str) -> Option<String> {
+fn prototype_fault(name: &str, params: &str) -> Option<String> {
     let text = params.trim();
     if text.is_empty() {
         return Some(
@@ -3242,7 +3688,20 @@ fn prototype_fault(params: &str) -> Option<String> {
             .rsplit(|c: char| !(c.is_alphanumeric() || c == '_'))
             .next()
             .is_some_and(|w| !w.is_empty() && !TYPE_WORDS.contains(&w));
-        if !ends_in_name {
+        // What remains once the qualifiers are gone is the type, and possibly a
+        // name after it. One word left is a typedef name with no parameter name
+        // after it, and `struct X` / `union X` / `enum X` is a tag with no name.
+        let core: Vec<&str> = stripped
+            .split(|c: char| !(c.is_alphanumeric() || c == '_'))
+            .filter(|w| !w.is_empty() && !matches!(*w, "const" | "volatile" | "restrict" | "_Atomic"))
+            .collect();
+        // Nothing here expands macros, so a lone word is only read as a typedef
+        // name when neither it nor the declarator looks like one: `int f(VOID);`,
+        // `int f(PARAMS);`, `static DEFINE_MUTEX(lock);`, `int a ALIGNED(x);`.
+        let typedef_only =
+            core.len() == 1 && !looks_like_macro(core[0]) && !looks_like_macro(name);
+        let tag_only = core.len() == 2 && matches!(core[0], "struct" | "union" | "enum");
+        if !ends_in_name || typedef_only || tag_only {
             return Some(format!(
                 "has an unnamed parameter (`{p}`); a prototype must name every parameter, or \
                  nothing says what it is for"
@@ -3250,6 +3709,15 @@ fn prototype_fault(params: &str) -> Option<String> {
         }
     }
     None
+}
+
+/// The naming conventions that mark a word as a macro: all capitals, or the
+/// implementation's leading double underscore. Only a convention, so a typedef
+/// spelled `UINT8` is not read as a type by whoever asks this.
+fn looks_like_macro(word: &str) -> bool {
+    word.starts_with("__")
+        || (word.bytes().any(|b| b.is_ascii_uppercase())
+            && !word.bytes().any(|b| b.is_ascii_lowercase()))
 }
 
 /// `char c[static 1]` -> `char c`. Array bounds are not the parameter's name.
@@ -3273,6 +3741,43 @@ const TYPE_WORDS: &[&str] = &[
     "bool", "const", "volatile", "restrict", "static", "inline", "_Atomic", "struct", "union",
     "enum", "size_t", "ptrdiff_t",
 ];
+
+/// Words that make a return type decidably not `void` when they appear in it.
+const BASIC_RETURN_WORDS: &[&str] = &[
+    "int", "char", "short", "long", "float", "double", "signed", "unsigned", "_Bool", "bool",
+    "struct", "union", "enum",
+];
+
+/// The value of an integer constant written as a single literal, or `None` when
+/// the text is not one.
+///
+/// Decimal, octal, hexadecimal and binary, with any of the integer suffixes. A
+/// float, a character constant, a digit-separated number and anything else this
+/// does not read as an integer give `None`, so a caller comparing against a value
+/// is never told a guess.
+fn integer_literal_value(text: &str) -> Option<u128> {
+    let mut digits = text.to_ascii_lowercase();
+    while digits.ends_with(['u', 'l']) {
+        digits.pop();
+    }
+    let hex = digits.starts_with("0x");
+    if !hex && digits.ends_with("wb") {
+        digits.truncate(digits.len() - 2);
+    }
+    let (body, radix) = if let Some(h) = digits.strip_prefix("0x") {
+        (h.to_string(), 16)
+    } else if let Some(b) = digits.strip_prefix("0b") {
+        (b.to_string(), 2)
+    } else if digits.len() > 1 && digits.starts_with('0') {
+        (digits[1..].to_string(), 8)
+    } else {
+        (digits.clone(), 10)
+    };
+    if body.is_empty() || !body.chars().all(|c| c.is_digit(radix)) {
+        return None;
+    }
+    u128::from_str_radix(&body, radix).ok()
+}
 
 /// The first 31 characters, which is the guaranteed-significant length for
 /// **external** identifiers in C99 and later.
@@ -3524,7 +4029,8 @@ fn mask_literals(text: &str) -> String {
 
 /// A function-like macro parameter used in the body without surrounding
 /// parentheses (MISRA C Rule 20.7).
-/// True when a macro parameter names the type of a compound literal, `(T){...}`.
+/// True when a macro parameter names the type of a compound literal, `(T){...}`,
+/// or is used as `(T *)`, which no expression can be: a function cannot take a type.
 ///
 /// A control statement has the same shape, so `if (p) {` is ruled out by the word
 /// before the parenthesis, and `...` by accepting identifiers only: it would
@@ -3540,12 +4046,22 @@ fn parameter_is_a_type(body: &str) -> bool {
             .and_then(|r| r.trim_start().strip_prefix(')'))
             .is_some_and(|r| r.trim_start().starts_with('{'))
     };
+    let points_to = |rest: &str, p: &str| {
+        rest.trim_start().strip_prefix(p).is_some_and(|r| {
+            let r = r.trim_start();
+            let after = r.trim_start_matches(|c: char| c == '*' || c.is_whitespace());
+            after.len() < r.len() && r.starts_with('*') && after.starts_with(')')
+        })
+    };
     body[open + 1..close]
         .split(',')
         .map(str::trim)
         .filter(|p| !p.is_empty() && p.bytes().all(is_word_byte))
         .any(|p| {
             replacement.match_indices('(').any(|(at, _)| {
+                if points_to(&replacement[at + 1..], p) {
+                    return true;
+                }
                 let word = replacement[..at]
                     .trim_end()
                     .rsplit(|c: char| !c.is_ascii_alphanumeric() && c != '_')
@@ -3596,6 +4112,13 @@ fn unparenthesized_parameter(body: &str) -> Option<String> {
 
 fn is_word_byte(b: u8) -> bool {
     b == b'_' || b.is_ascii_alphanumeric()
+}
+
+/// A macro's replacement list as far as `#` and `##` are concerned: literals and
+/// comments blanked, since a `#` in `"#1 release"` is not an operator, and the
+/// digraphs `%:` and `%:%:` spelled as the operators they are.
+fn macro_operators(body: &str) -> String {
+    mask_literals(body).replace("%:%:", "##").replace("%:", "#")
 }
 
 /// `#a ## b` — the evaluation order of adjacent `#` and `##` is unspecified.

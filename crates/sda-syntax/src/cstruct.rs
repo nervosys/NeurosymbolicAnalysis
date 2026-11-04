@@ -200,6 +200,9 @@ pub struct SwitchStatement {
     pub has_default: bool,
     /// Number of `case` labels.
     pub case_count: usize,
+    /// Number of clauses: runs of labels with nothing between them count once,
+    /// so `case 1: case 2: g(); break;` is one clause, not two.
+    pub clauses: usize,
     /// `default` appears somewhere other than the final clause.
     pub default_not_last: bool,
     /// Positions of non-empty clauses that fall through to the next label
@@ -267,6 +270,9 @@ pub struct CStructure {
     pub conditionals: Vec<ConditionalBlock>,
     /// Positions of `#endif` with no matching opener, and unclosed openers.
     pub unbalanced_conditionals: Vec<Pos>,
+    /// Positions of `#else`, `#elif`, `#elifdef` or `#elifndef` that come after
+    /// the `#else` of their own level. The preprocessor takes one `#else`, last.
+    pub after_else: Vec<Pos>,
     pub max_conditional_depth: u32,
     pub functions: Vec<CFunction>,
     pub controls: Vec<ControlStatement>,
@@ -322,8 +328,10 @@ pub fn analyze_c(src: &str, lexed: &Lexed) -> CStructure {
 
 fn parse_directives(src: &str, lexed: &Lexed, st: &mut CStructure) {
     let mut depth: u32 = 0;
-    // Stack of (open position, condition text) for open conditionals.
-    let mut open: Vec<(Pos, String)> = Vec::new();
+    // Stack of (open position, condition text, `#else` seen at this level) for
+    // open conditionals. Each level keeps its own state, so a nested
+    // conditional's `#else` says nothing about the level around it.
+    let mut open: Vec<(Pos, String, bool)> = Vec::new();
 
     for tok in lexed.directives() {
         let text = tok.text(src);
@@ -338,13 +346,27 @@ fn parse_directives(src: &str, lexed: &Lexed, st: &mut CStructure) {
         let recorded_depth = match kind {
             k if k.opens_conditional() => {
                 depth += 1;
-                open.push((tok.pos, body.clone()));
+                open.push((tok.pos, body.clone(), false));
+                depth
+            }
+            // Only one `#else` per level, and nothing may follow it at that
+            // level: a second `#else`, or any `#elif`/`#elifdef`/`#elifndef`,
+            // has no partner the preprocessor will accept.
+            k if k.continues_conditional() => {
+                if let Some(level) = open.last_mut() {
+                    if level.2 {
+                        st.after_else.push(tok.pos);
+                    }
+                    if kind == DirectiveKind::Else {
+                        level.2 = true;
+                    }
+                }
                 depth
             }
             k if k.closes_conditional() => {
                 let d = depth;
                 match open.pop() {
-                    Some((open_pos, cond)) => {
+                    Some((open_pos, cond, _)) => {
                         st.conditionals.push(ConditionalBlock {
                             open: open_pos,
                             close: Some(tok.pos),
@@ -394,7 +416,7 @@ fn parse_directives(src: &str, lexed: &Lexed, st: &mut CStructure) {
     }
 
     // Anything still open at end of file is unbalanced.
-    for (pos, cond) in open {
+    for (pos, cond, _) in open {
         st.unbalanced_conditionals.push(pos);
         st.conditionals.push(ConditionalBlock { open: pos, close: None, depth: 0, condition: cond });
     }
@@ -837,6 +859,20 @@ fn parse_switches(src: &str, code: &[&CToken], st: &mut CStructure) {
         }
 
         let case_count = labels.iter().filter(|(_, d)| !*d).count();
+        // A clause starts at a label unless the label follows the previous one
+        // with nothing between them but that label's own `:`: `case 1: case 2:`
+        // is one clause with two labels. Any `;`, `{` or `}` between two labels
+        // means a statement sits between them, so they are separate clauses.
+        let clauses = labels
+            .iter()
+            .enumerate()
+            .filter(|(n, (idx, _))| {
+                *n == 0 || {
+                    let prev = labels[*n - 1].0;
+                    (prev..*idx).any(|k| matches!(code[k].text(src), ";" | "{" | "}"))
+                }
+            })
+            .count();
         let has_default = labels.iter().any(|(_, d)| *d);
         let default_not_last = labels.iter().position(|(_, d)| *d).is_some_and(|p| p + 1 < labels.len());
 
@@ -867,6 +903,7 @@ fn parse_switches(src: &str, code: &[&CToken], st: &mut CStructure) {
             span: code[i].span,
             has_default,
             case_count,
+            clauses,
             default_not_last,
             fallthrough_clauses: fallthrough,
             misplaced_labels,
