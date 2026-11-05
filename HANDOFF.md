@@ -387,17 +387,29 @@ from WSL: 10,304 `.c` and 12,882 `.h`, some of them C++ despite a filter. An aud
 agent compared every tenth file, 2,318 of them, between 1.0.1 and `4d40e04`. That
 found about 121 new 8.2 false positives from the previous batch, on
 `CU_Test(suite, name) {`, `aligned_data(4);` and the like. 8.2 now reads a lone word as
-a typedef name only on a declarator with a return type before it, and not when the
-word is a number or spelled like a macro. All 121 are gone, and the 47 real findings
-sampled from FreeBSD's headers, `int iswalnum(wint_t);` for one, were left alone.
+a typedef name only in a declaration with a return type before its name, and not when
+the word is a number or spelled like a macro. A definition never has it read that way:
+before C23 a definition must name its parameters, so one in compiling code is a macro.
+All 121 are gone, and the real findings in FreeBSD's headers, `int iswalnum(wint_t);`
+for one, still fire. C23 allows the unnamed form in a definition, so that is a miss.
 
 Then, between `4d40e04` and this tree, the same sample changed only 8.2 (121
 removed), 13.3 (95 removed, 9 added), 15.4 (3 removed, 7 added), 8.11 (16 removed) and
 Dir 4.6 (28 removed). The 13.3 additions I read are real violations reported on their
 own line instead of the `for` above them, such as `base[off++] = 0;`. From the earlier
 step, the 186 removed 15.2 findings were all forward jumps in their own function, by
-script. **The full 23,000-file comparison did not finish:** the machine ran out of
-memory, and it was stopped. Everything here rests on the sample.
+script.
+
+A second tenth of the corpus, sharing no file with the first, was then compared with
+1.0.1. It found what the first could not: `CU_Test` after a macro on the line before,
+which read as a return type, and a string argument in `locate_data(".ram")`. Both are
+fixed above. Its other new findings that were read are real: FreeBSD prototypes such
+as `void vm_object_destroy (vm_object_t);`, `switch (c = *fmt++)`, a `goto` out of a
+nested block in `foc_main.c`, and `inline` without `static` in `ddsi__vendor.h`.
+
+**The full 23,000-file comparison did not finish:** the machine ran out of memory, and
+it was stopped. Everything here rests on these two samples, a fifth of the corpus, and
+on the findings read from them, not all of them.
 
 **Use `--format json` to compare scans.** The text report stops at about 500 findings
 and prints how many it left out, so a text diff of a large tree silently compares

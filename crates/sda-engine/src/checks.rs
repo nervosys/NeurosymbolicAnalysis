@@ -1216,6 +1216,9 @@ pub const C_NEAR_MISSES: &[NearMiss] = &[
     nm("8.2", "a.c", "static unsigned char rx[4] aligned_data(4);\n", "an attribute macro on an array"),
     nm("8.2", "a.c", "struct s; int attribute_format(2, 3);\n", "a number is not a type"),
     nm("17.10", "a.c", "__attribute__((noreturn, cold)) void die(void);\n", "the rest of the list is not the return type"),
+    nm("8.2", "a.c", "PRAGMA_OFF\nCU_Test(a, b)\n{\n}\n", "a macro before a macro; a definition must name its parameters"),
+    nm("8.2", "a.c", "PRAGMA_OFF(4996)\nCU_Test(a, b)\n{\n}\n", "a macro before a macro; a definition must name its parameters"),
+    nm("8.2", "a.c", "static unsigned char v[4] locate_data(\".ram\");\n", "a string is not a parameter"),
 ];
 
 /// Near-misses for the Rust checks.

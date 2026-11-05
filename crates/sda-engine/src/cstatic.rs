@@ -1676,7 +1676,10 @@ impl<'a> Cx<'a> {
             if f.name.starts_with("__") {
                 continue;
             }
-            if let Some(why) = prototype_fault(&f.params, self.reads_lone_words(&f.name, f.pos)) {
+            // A definition has to name its parameters to compile before C23, so a
+            // lone word in one is a macro invocation: `CU_Test(suite, name) { .. }`,
+            // whatever precedes it. Only a declaration has it read as a type.
+            if let Some(why) = prototype_fault(&f.params, false) {
                 hits.push((
                     "8.2",
                     f.pos.line,
@@ -1733,10 +1736,10 @@ impl<'a> Cx<'a> {
     /// Whether the declarator `name` at `pos` looks enough like a typed function
     /// for a lone word among its parameters to be read as a typedef name.
     ///
-    /// Without expanding macros the shape is all there is. `CU_Test(suite, name) {`
-    /// and `static DEFINE_mutex(lock);` have no return type before the name, only
-    /// storage classes at most. `char buf[4] aligned_data(x);` has a declarator
-    /// already. `int a ALIGNED(x);` is spelled like a macro. All are invocations.
+    /// Without expanding macros the shape is all there is. `static DEFINE_mutex(lock);`
+    /// has no return type before the name, only storage classes at most.
+    /// `char buf[4] aligned_data(x);` has a declarator already. `int a ALIGNED(x);`
+    /// is spelled like a macro. All are invocations.
     fn reads_lone_words(&self, name: &str, pos: sda_syntax::Pos) -> bool {
         if looks_like_macro(name) {
             return false;
@@ -3839,7 +3842,12 @@ fn prototype_fault(params: &str, reads_lone_words: bool) -> Option<String> {
         // C is a different thing. `SPI::DRDY drdy_gpio = {}`,
         // `decltype(&C::instantiate)` and `const char (&name)[N]` are all named
         // parameters, in a language this pass is not reading.
-        if p.contains("::") || p.contains('&') || p.contains('=') || p.contains('<') {
+        if p.contains("::")
+            || p.contains('&')
+            || p.contains('=')
+            || p.contains('<')
+            || p.contains('"')
+        {
             continue;
         }
         // Nor one whose own parentheses this split cannot honour. A
