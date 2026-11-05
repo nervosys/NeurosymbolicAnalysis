@@ -36,6 +36,23 @@ refreshing.
   - 20.14 for a second `#else`, or an `#elif` after one
   - 8.16 for `alignas(0u)`
   - 20.10 for the digraphs `%:` and `%:%:`
+- More false positives no longer reported:
+  - 13.3 for a control header and the statement after it, as in
+    `for (i = 0; i < n; i++) sum += a[i];`
+  - 8.11 for a parameter's `[]` or the next declaration's
+  - 12.3 for declarations led by an attribute, `__typeof__` or a macro
+  - 13.4 and 13.6 for a designator's `=`, and 13.6 for `offsetof` and `my_t (*)[4]`
+  - 15.4 for a `goto` whose label is in the same loop
+  - Dir 4.6 for `typedef unsigned int u32_t;`
+- More violations now reported:
+  - 8.11 on a declaration with long specifiers
+  - 13.6 for `sizeof a[i++]`
+  - 15.4 for a `goto` leaving the loop from a nested `switch` or loop
+  - Dir 4.12 for `&malloc` and `{ malloc }`
+  - 21.6, 21.10 and 21.12 for a parenthesised call such as `(printf)("x")`
+- 13.3 reports a violation in a loop or `if` body on its own line, not the header's.
+- 17.10 no longer fires on `krb5_error_code f(...) __attribute__((noreturn));`,
+  because the return type is a typedef name it cannot read.
 - The 5.4 message said 31 significant characters where the check compares 63.
 
 ## [1.0.1] - 2026-11-04

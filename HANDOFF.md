@@ -359,6 +359,67 @@ New known limits:
   and `int f(void) __attribute__((noreturn));` are silent;
 * 20.14 still does not report a stray `#else` with no open conditional.
 
+**A fifth pass read the least-audited guidelines and compared real C at scale.**
+Also on `master` only, and in no release.
+
+False positives fixed:
+* 13.3 ran a control header into the statement after it, so
+  `for (i = 0; i < n; i++) sum += a[i];` was a finding;
+* 8.11 took any `[]` within twelve tokens of `extern`, including a parameter's or
+  the next declaration's;
+* 12.3 read declarations led by an attribute, `__typeof__` or a macro as comma
+  operators;
+* 13.4 and 13.6 read a designator's `=` as an assignment, and 13.6 read `offsetof`
+  and `my_t (*)[4]` as calls;
+* 15.4 counted a `goto` whose label is in the same loop;
+* Dir 4.6 fired on `typedef unsigned int u32_t;`, which is how a width-explicit name
+  comes to exist. Only a name with a digit in it is excused.
+
+Misses fixed:
+* 8.11 past that window;
+* 13.6 inside a subscript, in `sizeof a[i++]`;
+* 15.4 on a `goto` leaving the loop from a nested `switch` or loop;
+* Dir 4.12 on `&malloc` and `{ malloc }`;
+* 21.6, 21.10 and 21.12 on the parenthesised call `(printf)("x")`.
+
+**The comparison.** PX4's vendored C and NuttX, FreeBSD and Linux headers were copied
+from WSL: 10,304 `.c` and 12,882 `.h`, some of them C++ despite a filter. An audit
+agent compared every tenth file, 2,318 of them, between 1.0.1 and `4d40e04`. That
+found about 121 new 8.2 false positives from the previous batch, on
+`CU_Test(suite, name) {`, `aligned_data(4);` and the like. 8.2 now reads a lone word as
+a typedef name only on a declarator with a return type before it, and not when the
+word is a number or spelled like a macro. All 121 are gone, and the 47 real findings
+sampled from FreeBSD's headers, `int iswalnum(wint_t);` for one, were left alone.
+
+Then, between `4d40e04` and this tree, the same sample changed only 8.2 (121
+removed), 13.3 (95 removed, 9 added), 15.4 (3 removed, 7 added), 8.11 (16 removed) and
+Dir 4.6 (28 removed). The 13.3 additions I read are real violations reported on their
+own line instead of the `for` above them, such as `base[off++] = 0;`. From the earlier
+step, the 186 removed 15.2 findings were all forward jumps in their own function, by
+script. **The full 23,000-file comparison did not finish:** the machine ran out of
+memory, and it was stopped. Everything here rests on the sample.
+
+**Use `--format json` to compare scans.** The text report stops at about 500 findings
+and prints how many it left out, so a text diff of a large tree silently compares
+only the first page.
+
+Candidates left alone, because the licensed text would settle them:
+* 16.3 on a clause ending in `exit(1)` or a macro for `break`;
+* 21.6 and 21.10 on a project's own `putc` or `clock`, and 21.6 on `printf` by value;
+* 13.3 on `char c = *s++;`, `(*fp)(i++)` and `*p++ + *p++`;
+* 13.6 on `sizeof(COUNT(t))`, since the macro's body is unknown to the check;
+* 18.5 through a typedef, 8.14 and Dir 4.12 and Dir 4.6 through a macro alias;
+* Dir 4.6 on `int argc` in `main`;
+* 16.6 on four grouped labels with no `default`, which this now calls one clause.
+
+New known limits:
+* 17.10 cannot see a return type that is a typedef name, so
+  `krb5_error_code krb5_abort(...) __attribute__((noreturn, ...));` in FreeBSD's
+  Kerberos headers went silent. 1.0.1 reported those eight by accident, since it
+  reported every use of the word;
+* a lower-case attribute macro on a typed declaration, `int a aligned(x);`, still
+  reads as a prototype.
+
 **Release mechanics for the next version:** bump the version in
 `Cargo.toml`, `gui/src-tauri/Cargo.toml`, `gui/src-tauri/tauri.conf.json`,
 `gui/package.json`, `gui/package-lock.json` and both `Cargo.lock`s, and in the

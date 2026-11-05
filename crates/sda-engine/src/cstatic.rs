@@ -1650,7 +1650,7 @@ impl<'a> Cx<'a> {
                 _ if BASIC_NUMERIC_TYPES.contains(&t) => {
                     // `int main(...)` is required to be spelled that way.
                     let is_main = i + 1 < n && self.tok(i + 1) == "main";
-                    if !is_main {
+                    if !is_main && !self.defines_a_sized_name(i) {
                         hits.push((
                             "D4.6",
                             line,
@@ -1676,7 +1676,7 @@ impl<'a> Cx<'a> {
             if f.name.starts_with("__") {
                 continue;
             }
-            if let Some(why) = prototype_fault(&f.name, &f.params) {
+            if let Some(why) = prototype_fault(&f.params, self.reads_lone_words(&f.name, f.pos)) {
                 hits.push((
                     "8.2",
                     f.pos.line,
@@ -1686,7 +1686,7 @@ impl<'a> Cx<'a> {
             }
         }
         for (name, pos, params) in self.file_scope_declarations() {
-            if let Some(why) = prototype_fault(&name, &params) {
+            if let Some(why) = prototype_fault(&params, self.reads_lone_words(&name, pos)) {
                 hits.push(("8.2", pos.line, pos.column, format!("`{name}` {why}")));
             }
         }
@@ -1696,7 +1696,7 @@ impl<'a> Cx<'a> {
             if self.function_scope_of(pos.line, pos.column).is_none() {
                 continue;
             }
-            if let Some(why) = prototype_fault(&name, &params) {
+            if let Some(why) = prototype_fault(&params, self.reads_lone_words(&name, pos)) {
                 hits.push(("8.2", pos.line, pos.column, format!("`{name}` {why}")));
             }
         }
@@ -1714,9 +1714,7 @@ impl<'a> Cx<'a> {
 
         // 8.11: an extern array must state its size.
         for i in 0..n {
-            if self.tok(i) == "extern"
-                && let Some(k) = (i..n.min(i + 12)).find(|k| self.tok(*k) == "[")
-                    && k + 1 < n && self.tok(k + 1) == "]" {
+            if self.tok(i) == "extern" && self.declares_unsized_array(i) {
                         let (line, col) = self.pos_of(i);
                         hits.push((
                             "8.11",
@@ -1730,6 +1728,77 @@ impl<'a> Cx<'a> {
         for (rule, line, col, msg) in hits {
             self.emit(rule, line, col, msg);
         }
+    }
+
+    /// Whether the declarator `name` at `pos` looks enough like a typed function
+    /// for a lone word among its parameters to be read as a typedef name.
+    ///
+    /// Without expanding macros the shape is all there is. `CU_Test(suite, name) {`
+    /// and `static DEFINE_mutex(lock);` have no return type before the name, only
+    /// storage classes at most. `char buf[4] aligned_data(x);` has a declarator
+    /// already. `int a ALIGNED(x);` is spelled like a macro. All are invocations.
+    fn reads_lone_words(&self, name: &str, pos: sda_syntax::Pos) -> bool {
+        if looks_like_macro(name) {
+            return false;
+        }
+        let at = self.code.partition_point(|t| (t.pos.line, t.pos.column) < (pos.line, pos.column));
+        let mut k = at;
+        while k > 0 {
+            k -= 1;
+            match self.tok(k) {
+                "static" | "extern" | "inline" | "__inline" | "__inline__" | "_Noreturn" => {}
+                ";" | "{" | "}" | "]" => return false,
+                _ => return true,
+            }
+        }
+        false
+    }
+
+    /// Whether the declaration after the `extern` at `at` has an empty `[]` on one
+    /// of its own declarators.
+    ///
+    /// Read to the end of the declaration, however long its specifiers. Brackets
+    /// inside parentheses belong to a parameter or an attribute, and `(*p)[]` is
+    /// a pointer, so neither counts. Nothing after the `;` is this declaration's.
+    fn declares_unsized_array(&self, at: usize) -> bool {
+        let n = self.code.len();
+        let mut depth = 0i32;
+        for k in at + 1..n {
+            match self.tok(k) {
+                "(" => depth += 1,
+                ")" => depth -= 1,
+                ";" | "{" | "=" if depth == 0 => return false,
+                "[" if depth == 0
+                    && k + 1 < n
+                    && self.tok(k + 1) == "]"
+                    && self.tok(k - 1) != ")" =>
+                {
+                    return true;
+                }
+                _ => {}
+            }
+        }
+        false
+    }
+
+    /// Whether the basic type at `at` is part of a `typedef` whose new name states
+    /// a width, such as `typedef unsigned int u32_t;`. That is how a width-explicit
+    /// name comes to exist, so there is nothing else for it to use.
+    ///
+    /// Read from the name alone, a digit being the only sign this pass has.
+    fn defines_a_sized_name(&self, at: usize) -> bool {
+        let boundary = |t: &str| matches!(t, ";" | "{" | "}");
+        let start = (0..at).rev().find(|k| boundary(self.tok(*k))).map_or(0, |k| k + 1);
+        if !(start..at).any(|k| self.tok(k) == "typedef") {
+            return false;
+        }
+        let Some(end) = (at..self.code.len()).find(|k| boundary(self.tok(*k))) else {
+            return false;
+        };
+        end > at
+            && self.tok(end) == ";"
+            && self.code[end - 1].kind == CTokenKind::Identifier
+            && self.tok(end - 1).bytes().any(|b| b.is_ascii_digit())
     }
 
     /// Whether the declaration that `inline` at `at` belongs to says `static` or
@@ -1768,12 +1837,21 @@ impl<'a> Cx<'a> {
         let n = self.code.len();
         let mut words: Vec<usize> = Vec::new();
         let mut k = at + 1;
-        // `noreturn` may be the word inside `__attribute__((noreturn))`,
+        // `noreturn` may be the word inside `__attribute__((noreturn, cold))`,
         // `__declspec(noreturn)` or `[[noreturn]]`; what it qualifies starts after
         // the closing brackets. A trailing attribute then meets `;` or `{` with no
         // words read, which decides nothing.
-        while k < n && matches!(self.tok(k), ")" | "]") {
-            k += 1;
+        if at > 0 && matches!(self.tok(at - 1), "(" | "," | "[") {
+            let mut depth = 0i32;
+            while k < n {
+                match self.tok(k) {
+                    "(" | "[" => depth += 1,
+                    ")" | "]" => depth -= 1,
+                    _ if depth < 0 => break,
+                    _ => {}
+                }
+                k += 1;
+            }
         }
         let mut stop = None;
         while k < n {
@@ -2201,9 +2279,10 @@ impl<'a> Cx<'a> {
         self.check_else_chains();
     }
 
-    /// Count `break` and `goto` statements directly inside a loop body,
+    /// Count the statements that leave a loop: each `break` directly in its body,
     /// excluding those belonging to a nested loop or switch — a `break` inside
-    /// a nested `switch` leaves the switch, not the loop.
+    /// a nested `switch` leaves the switch, not the loop — and each `goto` at any
+    /// depth whose label is not in the body, since nesting cannot contain a jump.
     fn count_loop_exits(&self, body: sda_syntax::Span) -> usize {
         let Some(first) = self.code.iter().position(|t| t.span.start == body.start) else {
             return 0;
@@ -2223,14 +2302,27 @@ impl<'a> Cx<'a> {
                 "for" | "while" | "do" | "switch" => {
                     i = cstruct::statement_end(self.src, &self.code, i, close).max(i + 1);
                 }
-                "break" | "goto" => {
+                "break" => {
                     count += 1;
                     i += 1;
                 }
                 _ => i += 1,
             }
         }
+        let labelled_here = |name: &str| {
+            (first + 1..close).any(|m| {
+                self.tok(m) == name
+                    && m + 1 < close
+                    && self.tok(m + 1) == ":"
+                    && matches!(self.tok(m - 1), ";" | "{" | "}" | ":" | ")")
+            })
+        };
         count
+            + (first + 1..close)
+                .filter(|&k| {
+                    self.tok(k) == "goto" && k + 1 < close && !labelled_here(self.tok(k + 1))
+                })
+                .count()
     }
 
     /// 15.7: an `if ... else if` chain must end in an `else`.
@@ -2547,10 +2639,14 @@ impl<'a> Cx<'a> {
                     // the commas there separate declarators, not operands.
                     let declares_init = t == "for" && self.begins_declaration(i + 2);
                     let mut nested_assignment: Option<(u32, u32)> = None;
+                    // Inside braces, `=` is a designator's: `(struct s){ .x = 1 }`.
+                    let mut braces = 0i32;
                     for k in i + 1..close {
                         match self.tok(k) {
                             "(" => depth += 1,
                             ")" => depth -= 1,
+                            "{" => braces += 1,
+                            "}" => braces -= 1,
                             ";" if depth == 1 => semicolons += 1,
                             "," if depth == 1 && !(declares_init && semicolons == 0) => {
                                 let (cl, cc) = self.pos_of(k);
@@ -2562,6 +2658,7 @@ impl<'a> Cx<'a> {
                                 ));
                             }
                             s if depth > 1
+                                && braces == 0
                                 && nested_assignment.is_none()
                                 && cstruct::ASSIGNMENT_OPERATORS.contains(&s) =>
                             {
@@ -2609,9 +2706,25 @@ impl<'a> Cx<'a> {
     fn increment_statement_findings(&self) -> Vec<(&'static str, u32, u32, String)> {
         let mut out = Vec::new();
         let n = self.code.len();
+        // A control header is a full expression of its own, or three of them, so
+        // `for (i = 0; i < n; i++) sum += a[i];` is four, none combining anything.
+        // `else` and `do` end nothing but start a new statement.
+        let mut cut = vec![false; n];
+        for k in 0..n {
+            match self.tok(k) {
+                "if" | "while" | "switch" | "for" if k + 1 < n && self.tok(k + 1) == "(" => {
+                    cut[k + 1] = true;
+                    if let Some(close) = cstruct::matching(self.src, &self.code, k + 1, "(", ")") {
+                        cut[close] = true;
+                    }
+                }
+                "else" | "do" => cut[k] = true,
+                _ => {}
+            }
+        }
         let mut start = 0usize;
-        for i in 0..n {
-            if !matches!(self.tok(i), ";" | "{" | "}") {
+        for (i, &at_edge) in cut.iter().enumerate() {
+            if !at_edge && !matches!(self.tok(i), ";" | "{" | "}") {
                 continue;
             }
             let stmt = start..i;
@@ -2657,15 +2770,8 @@ impl<'a> Cx<'a> {
             return false;
         }
         if self.tok(i + 1) == "(" {
-            return cstruct::matching(self.src, &self.code, i + 1, "(", ")").is_some_and(|close| {
-                (i + 2..close).any(|k| {
-                    matches!(self.tok(k), "++" | "--")
-                        || cstruct::ASSIGNMENT_OPERATORS.contains(&self.tok(k))
-                        || (self.code[k].kind == CTokenKind::Identifier
-                            && k + 1 < close
-                            && self.tok(k + 1) == "(")
-                })
-            });
+            return cstruct::matching(self.src, &self.code, i + 1, "(", ")")
+                .is_some_and(|close| self.tokens_have_effect(i + 2, close));
         }
         let mut k = i + 1;
         loop {
@@ -2694,7 +2800,12 @@ impl<'a> Cx<'a> {
                 // A call: an identifier followed by `(`.
                 "(" => return true,
                 "[" => match cstruct::matching(self.src, &self.code, k, "[", "]") {
-                    Some(close) => k = close + 1,
+                    Some(close) => {
+                        if self.tokens_have_effect(k + 1, close) {
+                            return true;
+                        }
+                        k = close + 1;
+                    }
                     None => return false,
                 },
                 "." | "->" => k += 2,
@@ -2702,6 +2813,35 @@ impl<'a> Cx<'a> {
                 _ => return false,
             }
         }
+    }
+
+    /// Whether `from..to`, part of an unevaluated operand, holds `++`, `--`, an
+    /// assignment or a call.
+    ///
+    /// A `=` in braces is a designator's, in `(struct s){ .x = 1 }`. Two things
+    /// that look like calls are not: `offsetof(..)`, which is a constant, and
+    /// the abstract declarator in `my_t (*)[4]`, since no call has `*` for its
+    /// whole argument.
+    fn tokens_have_effect(&self, from: usize, to: usize) -> bool {
+        let mut braces = 0i32;
+        (from..to).any(|k| {
+            match self.tok(k) {
+                "{" => braces += 1,
+                "}" => braces -= 1,
+                _ => {}
+            }
+            let abstract_declarator = k + 3 < to
+                && self.tok(k + 1) == "("
+                && self.tok(k + 2) == "*"
+                && self.tok(k + 3) == ")";
+            matches!(self.tok(k), "++" | "--")
+                || (braces == 0 && cstruct::ASSIGNMENT_OPERATORS.contains(&self.tok(k)))
+                || (self.code[k].kind == CTokenKind::Identifier
+                    && k + 1 < to
+                    && self.tok(k + 1) == "("
+                    && !matches!(self.tok(k), "offsetof" | "__builtin_offsetof")
+                    && !abstract_declarator)
+        })
     }
 
     /// D4.12, the address form: an allocation function used as a value, not
@@ -2720,7 +2860,7 @@ impl<'a> Cx<'a> {
         }
         let value_position = matches!(
             self.tok(i - 1),
-            "=" | "(" | "," | "return" | "?" | ":" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||"
+            "=" | "(" | "," | "{" | "&" | "return" | "?" | ":" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||"
         );
         let assigned = cstruct::ASSIGNMENT_OPERATORS.contains(&self.tok(i + 1))
             || matches!(self.tok(i + 1), "++" | "--");
@@ -2734,11 +2874,27 @@ impl<'a> Cx<'a> {
         if k >= n {
             return false;
         }
+        // Words that open a declaration whatever the lexer calls them, and no
+        // expression statement: `__attribute__((unused)) int a = 0, b = 0;`.
+        if k + 1 < n
+            && self.tok(k + 1) == "("
+            && matches!(
+                self.tok(k),
+                "__attribute__" | "__attribute" | "__declspec" | "__typeof__" | "__typeof"
+                    | "typeof" | "typeof_unqual" | "alignas" | "_Alignas"
+            )
+        {
+            return true;
+        }
         match self.code[k].kind {
             CTokenKind::Keyword => DECLARATION_START.contains(&self.tok(k)),
             CTokenKind::Identifier => {
                 k + 1 < n
                     && (self.code[k + 1].kind == CTokenKind::Identifier
+                        // A word before a type is a macro for a specifier:
+                        // `MAYBE_UNUSED int a = 0, b = 0;`.
+                        || (self.code[k + 1].kind == CTokenKind::Keyword
+                            && DECLARATION_START.contains(&self.tok(k + 1)))
                         || matches!(self.tok(k + 1), "*" | "&" | "::" | "<"))
             }
             _ => false,
@@ -2942,7 +3098,19 @@ impl<'a> Cx<'a> {
             // Only a call position counts for the banned functions; a variable
             // named `time` is fine. D4.12 also reaches an allocator named as a
             // value, which allocates just as well through the pointer it lands in.
-            if i + 1 >= n || self.tok(i + 1) != "(" {
+            // `(printf)("x")` calls it too, by the spelling that avoids a macro.
+            // The word before the parentheses must not make them a declarator's,
+            // a cast's operand or a control header's.
+            let parenthesised_call = i >= 1
+                && self.tok(i - 1) == "("
+                && i + 2 < n
+                && self.tok(i + 1) == ")"
+                && self.tok(i + 2) == "("
+                && (i < 2
+                    || self.tok(i - 2) == "return"
+                    || !(matches!(self.code[i - 2].kind, CTokenKind::Identifier | CTokenKind::Keyword)
+                        || matches!(self.tok(i - 2), ")" | "]" | "*")));
+            if !parenthesised_call && (i + 1 >= n || self.tok(i + 1) != "(") {
                 if self.names_allocator_as_value(i) {
                     let (line, col) = self.pos_of(i);
                     hits.push((
@@ -3643,7 +3811,7 @@ fn banned_message(name: &str, rule: &str) -> String {
 ///
 /// MISRA 8.2 asks for prototype form *with named parameters*, and the two
 /// failures read differently to whoever has to fix them.
-fn prototype_fault(name: &str, params: &str) -> Option<String> {
+fn prototype_fault(params: &str, reads_lone_words: bool) -> Option<String> {
     let text = params.trim();
     if text.is_empty() {
         return Some(
@@ -3695,11 +3863,14 @@ fn prototype_fault(name: &str, params: &str) -> Option<String> {
             .split(|c: char| !(c.is_alphanumeric() || c == '_'))
             .filter(|w| !w.is_empty() && !matches!(*w, "const" | "volatile" | "restrict" | "_Atomic"))
             .collect();
-        // Nothing here expands macros, so a lone word is only read as a typedef
-        // name when neither it nor the declarator looks like one: `int f(VOID);`,
-        // `int f(PARAMS);`, `static DEFINE_MUTEX(lock);`, `int a ALIGNED(x);`.
-        let typedef_only =
-            core.len() == 1 && !looks_like_macro(core[0]) && !looks_like_macro(name);
+        // Nothing here expands macros, so a lone word is read as a typedef name
+        // only on a declarator that looks like a function and only when the word
+        // could be a type: not a number (`aligned_data(4);`), and not a macro's
+        // spelling (`int f(VOID);`, `int f(PARAMS);`).
+        let typedef_only = reads_lone_words
+            && core.len() == 1
+            && !core[0].starts_with(|c: char| c.is_ascii_digit())
+            && !looks_like_macro(core[0]);
         let tag_only = core.len() == 2 && matches!(core[0], "struct" | "union" | "enum");
         if !ends_in_name || typedef_only || tag_only {
             return Some(format!(

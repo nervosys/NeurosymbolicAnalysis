@@ -275,6 +275,17 @@ pub const C_FIXTURES: &[Fixture] = &[
     fx("17.10", "a.c", "__attribute__((noreturn)) int die(void);\n"),
     fx("20.10", "a.c", "#define STR(x) %:x\n"),
     fx("20.10", "a.c", "#define CAT(a, b) a %:%: b\n"),
+    // The fifth pass.
+    fx("8.11", "a.c", "extern __attribute__((aligned(16))) const struct table_entry_with_long_name entries[];\n"),
+    fx("13.6", "a.c", "unsigned long f(int i, int *a) { return sizeof a[i++]; }\n"),
+    fx("15.4", "a.c", "void g(void); void f(int x) { while (x) { if (x > 2) { break; } switch (x) { case 1: goto out; default: break; } g(); } out: ; }\n"),
+    fx("15.4", "a.c", "void f(int x) { for (;;) { while (x) { goto out; } break; } out: ; }\n"),
+    fx("D4.12", "a.c", "void *(*alloc)(unsigned long) = &malloc;\n"),
+    fx("D4.12", "a.c", "struct ops o = { malloc };\n"),
+    fx("21.6", "a.c", "void f(void) { (printf)(\"x\"); }\n"),
+    fx("21.10", "a.c", "void f(void) { (time)(0); }\n"),
+    fx("21.12", "a.c", "void f(void) { (fetestexcept)(0); }\n"),
+    fx("17.10", "a.c", "__attribute__((noreturn, cold)) int die(void);\n"),
 ];
 
 /// Fixtures for the MISRA C++ checks.
@@ -1182,6 +1193,29 @@ pub const C_NEAR_MISSES: &[NearMiss] = &[
     nm("20.10", "a.c", "#define HASH '#'\n", "a `#` inside a character constant is not the operator"),
     nm("20.10", "a.c", "#define A 1 /* #1 */\n", "a `#` inside a comment is not the operator"),
     nm("D4.9", "a.c", "#define ALLOC(T) ((T *)malloc(sizeof(T)))\n", "a parameter used as `(T *)` is a type, which no function can take"),
+    nm("8.11", "a.c", "extern void log_names(const char *const names[]);\n", "the brackets are a parameter's"),
+    nm("8.11", "a.c", "extern int g_count;\nstatic int tbl[] = { 1, 2, 3 };\n", "the brackets are the next declaration's"),
+    nm("8.11", "a.c", "extern int (*p)[];\n", "a pointer, not an array"),
+    nm("D4.6", "a.h", "#ifndef T_H\n#define T_H\ntypedef unsigned int u32_t;\n#endif\n", "how a width-explicit name comes to exist"),
+    nm("13.3", "a.c", "int f(int *a, int n) { int i; int sum = 0; for (i = 0; i < n; i++) sum += a[i]; return sum; }\n", "the increment and the addition are separate full expressions"),
+    nm("13.3", "a.c", "struct n { struct n *next; };\nint f(struct n *head) { struct n *p; int c = 0; for (p = head; p; p = p->next) c++; return c; }\n", "the assignment is in the header, the increment in the body"),
+    nm("13.3", "a.c", "int f(int n) { int t = 0; while (n--) t += 2; return t; }\n", "the condition is a full expression of its own"),
+    nm("13.3", "a.c", "int ok(int x);\nint f(int x) { int c = 0; if (ok(x)) c++; return c; }\n", "the call is in the condition, the increment in the body"),
+    nm("13.4", "a.c", "struct s { int x; }; int g(struct s *p);\nvoid f(void) { if (g(&(struct s){ .x = 1 }) == 0) { } }\n", "that `=` is a designator's"),
+    nm("13.6", "a.c", "struct s { int x; };\nunsigned long n = sizeof((struct s){ .x = 1 });\n", "that `=` is a designator's"),
+    nm("13.6", "a.c", "struct s { int a; int b; };\nunsigned long n = sizeof(offsetof(struct s, b));\n", "`offsetof` is a constant, not a call"),
+    nm("13.6", "a.c", "typedef int my_t;\nunsigned long n = sizeof(my_t (*)[4]);\n", "a type name with an abstract declarator"),
+    nm("12.3", "a.c", "void f(void) { __attribute__((unused)) int a = 0, b = 0; }\n", "a declaration; those commas separate declarators"),
+    nm("12.3", "a.c", "void f(void) { MAYBE_UNUSED int a = 0, b = 0; }\n", "a macro before a type; still a declaration"),
+    nm("12.3", "a.c", "void f(int x) { __typeof__(x) a = x, b = x; }\n", "`__typeof__` names a type"),
+    nm("15.4", "a.c", "void f(int x) { int i; for (i = 0; i < 3; i++) { if (x) goto skip; x++; skip: ; if (i > 1) { break; } } }\n", "that `goto` stays in the loop, so only the `break` leaves it"),
+    nm("21.6", "a.c", "int (printf)(const char *format, ...);\n", "a declaration with a parenthesised name"),
+    nm("21.10", "a.c", "void f(int time, int x) { if (time)(void)x; }\n", "a variable as a condition, then a cast"),
+    nm("8.2", "a.c", "CU_Test(ddsc_userdata, endpoint) { }\n", "a test macro, with no return type before its name"),
+    nm("8.2", "a.c", "static DEFINE_mutex(lock);\n", "storage class only, so an invocation"),
+    nm("8.2", "a.c", "static unsigned char rx[4] aligned_data(4);\n", "an attribute macro on an array"),
+    nm("8.2", "a.c", "struct s; int attribute_format(2, 3);\n", "a number is not a type"),
+    nm("17.10", "a.c", "__attribute__((noreturn, cold)) void die(void);\n", "the rest of the list is not the return type"),
 ];
 
 /// Near-misses for the Rust checks.
