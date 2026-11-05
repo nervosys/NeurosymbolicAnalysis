@@ -23,3 +23,10 @@ release replaces them.
 write says what a scan, a build, the MCP server and the workbench will and will
 not do with it. Anything that runs a project's own build or test code is opt-in
 and says so.
+
+## Resource use on untrusted code
+
+`sda` has no limit on file size or scan time. Crafted input can make a scan slow,
+so put a timeout on any job that scans code you do not trust, such as a pull request
+from a fork. Releases before 1.0.2 could also be made to exhaust memory by a small
+file, and should not be used on untrusted code.

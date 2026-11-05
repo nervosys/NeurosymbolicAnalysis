@@ -390,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "sda-adapters"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-build",
  "sda-core",
@@ -401,7 +401,7 @@ dependencies = [
 
 [[package]]
 name = "sda-agent"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-adapters",
  "sda-ai",
@@ -416,7 +416,7 @@ dependencies = [
 
 [[package]]
 name = "sda-ai"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-core",
  "serde",
@@ -429,7 +429,7 @@ dependencies = [
 
 [[package]]
 name = "sda-build"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-core",
  "serde",
@@ -438,7 +438,7 @@ dependencies = [
 
 [[package]]
 name = "sda-cli"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -456,7 +456,7 @@ dependencies = [
 
 [[package]]
 name = "sda-core"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -467,7 +467,7 @@ dependencies = [
 
 [[package]]
 name = "sda-editor"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "ropey",
  "sda-core",
@@ -478,7 +478,7 @@ dependencies = [
 
 [[package]]
 name = "sda-engine"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-adapters",
  "sda-core",
@@ -491,7 +491,7 @@ dependencies = [
 
 [[package]]
 name = "sda-ontology"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-core",
  "serde",
@@ -501,7 +501,7 @@ dependencies = [
 
 [[package]]
 name = "sda-probe"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-core",
  "sda-engine",
@@ -509,7 +509,7 @@ dependencies = [
 
 [[package]]
 name = "sda-rules"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "sda-core",
  "serde",
@@ -518,7 +518,7 @@ dependencies = [
 
 [[package]]
 name = "sda-syntax"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "proc-macro2",
  "ra-ap-rustc_lexer",

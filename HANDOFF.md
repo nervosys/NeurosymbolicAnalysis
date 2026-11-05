@@ -295,7 +295,7 @@ Known limits:
 * 21.3 has the same call-only gap that Dir 4.12 had.
 
 **A third and a fourth pass, after 1.0.1, found more in both directions.** These
-fixes are on `master` and in no release yet; 1.0.1 still behaves the old way.
+fixes shipped in 1.0.2; 1.0.1 still behaves the old way.
 
 False positives fixed:
 * 15.2 matched a `goto` to a label of the same name in any function, and now looks
@@ -360,7 +360,7 @@ New known limits:
 * 20.14 still does not report a stray `#else` with no open conditional.
 
 **A fifth pass read the least-audited guidelines and compared real C at scale.**
-Also on `master` only, and in no release.
+Also in 1.0.2.
 
 False positives fixed:
 * 13.3 ran a control header into the statement after it, so
@@ -410,6 +410,35 @@ nested block in `foc_main.c`, and `inline` without `static` in `ddsi__vendor.h`.
 **The full 23,000-file comparison did not finish:** the machine ran out of memory, and
 it was stopped. Everything here rests on these two samples, a fifth of the corpus, and
 on the findings read from them, not all of them.
+
+**A security audit before the next release found a memory exhaustion bug in every
+release so far.** `SECURITY.md` names the scanned repository as something an attacker
+controls. Every finding quoted its whole source line, so memory was findings times
+line length: all on one line, 96 KB of `if (a) a++;` took 1.5 GB and 192 KB passed
+5 GB, and the same text on separate lines took 0.21 GB at 832 KB. `Evidence::source`
+now holds a quoted line to 400 bytes around the finding's column, which covers the C,
+C++ and Rust analyzers. The run also caught two slow paths from the batches above, a
+label search per `goto` and a function search per `goto` and label, both fixed.
+
+Forty-one hostile inputs of 40,000 repetitions, up to 1.4 MB, then ran one at a time
+under a memory and time cap. Peak memory was at most 0.34 GB, with no crash and no
+panic. An earlier uncapped run saw exit codes 101 and `0xC0000409`, mostly on 1.0.1,
+while the machine ran out of memory. They did not recur, and the cause was not proven.
+Rerun under the cap, `extern_parens` and `nested_loops_goto` needed longer but finished.
+
+**Still open: time.** Scanning is quadratic on crafted input, and there is no file size
+limit or per-file budget: 880 KB of nested loops took 169 s and 1.4 MB of small functions
+24.6 s, against 33.5 s on 1.0.1. A hostile file can slow a scan but no longer exhausts
+memory, so anyone scanning untrusted code should put a timeout on the job.
+`SECURITY.md` says so. Ordinary input scales about linearly: 40,000 statements took 5.5 s
+to 9.5 s, with findings or without, so the quadratic case is nesting far beyond real code.
+
+**For the owner, on this repository's settings.** Both were refused to an agent by the
+permission classifier, so they are still as they were: turn on secret scanning with
+push protection, and set the default workflow permission to read. Both workflows
+declare their own permissions, so neither change breaks anything. Decide too whether
+1.0.0 and 1.0.1 get a GitHub Security Advisory for the memory bug. A username remains
+in `crates/sda-engine/tests/fixtures/lcov.info` and in the public history.
 
 **Use `--format json` to compare scans.** The text report stops at about 500 findings
 and prints how many it left out, so a text diff of a large tree silently compares
@@ -934,7 +963,7 @@ once, by hand, against a tool or a corpus that is not part of the suite.
 
 | | | measured |
 |---|---|---|
-| Workspace tests | 1,101 across 90 binaries, all passing (1,099 `#[test]` functions and 2 doctests) | 2026-11-03 |
+| Workspace tests | 1,102 across 90 binaries, all passing (1,100 `#[test]` functions and 2 doctests) | 2026-11-03 |
 | GUI backend tests | 19, all passing (separate crate, `gui/src-tauri`) | 2026-11-02 |
 | `sda-editor` tests | 49 unit + 17 against real Monaco, all passing | in the suite |
 | Compiler warnings | 0 | 2026-10-30 |
@@ -1006,7 +1035,7 @@ minutes. **Do not kill a cargo process to get the lock** — see the section on 
 ```bash
 cargo test -p sda-editor                                               # 49
 cd gui/src-tauri && cargo test && cd ../..                             # 19
-cargo test --workspace                                                 # 1,101 / 90 binaries
+cargo test --workspace                                                 # 1,102 / 90 binaries
 cargo build --release                                                  # 0 warnings
 
 # `$SDA` because the target dir is not ./target on this machine — one shared
@@ -1022,7 +1051,7 @@ SDA=$(cargo metadata --format-version 1 --no-deps \
 # Scale, against someone else's checkout and read-only. cppcheck lives at the
 # path in *This machine*; the database is configured out of tree so llama.cpp is
 # untouched. clang-tidy over 184 files takes about 36 minutes.
-CPPCHECK='C:\Users\adamm\tools\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe'
+CPPCHECK='<tools>\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe'
 "$SDA" scan ~/dev/llama.cpp/src --with "ext.cppcheck=$CPPCHECK"       # ~1,450 findings
 cmake -S ~/dev/llama.cpp -B /tmp/llama-cc -G "NMake Makefiles" \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON                              # needs vcvars64
@@ -1084,7 +1113,7 @@ examples/firmware     a project with deliberate violations and a deviation file
 ```bash
 tools/verify.sh                             # the whole gate, as one command
 cargo build --release                       # sda binary; NOT ./target — see below
-cargo test --workspace                      # 1,101 tests across 90 binaries
+cargo test --workspace                      # 1,102 tests across 90 binaries
 cd gui/src-tauri && cargo test              # 16 more; not in the workspace run
 
 sda scan examples/firmware                          # static only
@@ -1159,7 +1188,7 @@ Facts that cost time to rediscover.
 * **Clippy is installed** (`clippy 0.1.98`); **Miri is not** — `rustup component
   add miri` fails with "unavailable for download for channel 'stable'". Both
   adapters run `cargo`, so `cargo --version` says nothing about either.
-* **cppcheck 2.21.0 lives at `C:\Users\adamm\tools\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe`,
+* **cppcheck 2.21.0 lives at `<tools>\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe`,
   durably this time.** `winget download --id Cppcheck.Cppcheck --download-directory
   <dir>` fetches the MSI without elevation and without installing, and
   `msiexec /a <msi> TARGETDIR=<dir> /qn` extracts it. The previous extraction went
@@ -1210,7 +1239,7 @@ Facts that cost time to rediscover.
 
   **Single-quote the whole `sh -lc` string, or Windows eats your variables.**
   `wsl -d Debian -- sh -lc "... \$HOME ..."` from PowerShell expands `$HOME` on
-  the *Windows* side first, so the distro receives the literal `C:Usersadamm`.
+  the *Windows* side first, so the distro receives the literal `C:Usersname`.
   Handed that as `CARGO_TARGET_DIR`, cargo created a directory of that name
   **inside this repository** — colon and all, which Windows stores as `C…`
   — and five cargo lock files were committed before anyone noticed. Use
@@ -3231,7 +3260,7 @@ stop them — the tests all passed, clippy was clean, the scans were clean, and 
 only reason anyone noticed was that git's line-ending warning happened to print
 the path. **The other four steps catch mistakes; this one catches accidents**,
 and it was an accident that put build artifacts in a commit. Watched refusing
-`C:Usersadamm`.
+`C:Usersname`.
 
 **And it looked only at the top level, so it missed one that was already there.**
 `tools/__pycache__/cppcheck-misra-oracle.cpython-310.pyc` — compiled bytecode

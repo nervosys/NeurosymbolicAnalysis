@@ -16,7 +16,7 @@ members = [
 ]
 
 [workspace.package]
-version = "1.0.1"
+version = "1.0.2"
 edition = "2024"
 rust-version = "1.88"
 license = "AGPL-3.0-or-later"
@@ -25,16 +25,16 @@ repository = "https://github.com/nervosys/NeurosymbolicAnalysis"
 description = "Agentic-first statodynamic (static + dynamic) code and AI-model analysis toolkit"
 
 [workspace.dependencies]
-sda-core = { path = "crates/sda-core", version = "1.0.1" }
-sda-syntax = { path = "crates/sda-syntax", version = "1.0.1" }
-sda-engine = { path = "crates/sda-engine", version = "1.0.1" }
-sda-adapters = { path = "crates/sda-adapters", version = "1.0.1" }
-sda-build = { path = "crates/sda-build", version = "1.0.1" }
-sda-ontology = { path = "crates/sda-ontology", version = "1.0.1" }
-sda-rules = { path = "crates/sda-rules", version = "1.0.1" }
-sda-ai = { path = "crates/sda-ai", version = "1.0.1" }
-sda-agent = { path = "crates/sda-agent", version = "1.0.1" }
-sda-editor = { path = "crates/sda-editor", version = "1.0.1" }
+sda-core = { path = "crates/sda-core", version = "1.0.2" }
+sda-syntax = { path = "crates/sda-syntax", version = "1.0.2" }
+sda-engine = { path = "crates/sda-engine", version = "1.0.2" }
+sda-adapters = { path = "crates/sda-adapters", version = "1.0.2" }
+sda-build = { path = "crates/sda-build", version = "1.0.2" }
+sda-ontology = { path = "crates/sda-ontology", version = "1.0.2" }
+sda-rules = { path = "crates/sda-rules", version = "1.0.2" }
+sda-ai = { path = "crates/sda-ai", version = "1.0.2" }
+sda-agent = { path = "crates/sda-agent", version = "1.0.2" }
+sda-editor = { path = "crates/sda-editor", version = "1.0.2" }
 
 anyhow = "1"
 thiserror = "2"

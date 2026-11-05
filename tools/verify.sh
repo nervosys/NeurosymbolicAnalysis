@@ -39,7 +39,7 @@ trap 'rm -f "$out"' EXIT
 # A commit must not invent a top-level entry.
 #
 # `wsl -d Debian -- sh -lc "... $HOME ..."` from PowerShell expands `$HOME` on
-# the Windows side, so the distro was handed the literal `C:Usersadamm` as
+# the Windows side, so the distro was handed the literal `C:Usersname` as
 # CARGO_TARGET_DIR and cargo built a target directory of that name *inside this
 # repository*. Five cargo lock files reached a commit, and the only reason anyone
 # noticed was that git's line-ending warning happened to print the path.

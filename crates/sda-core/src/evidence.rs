@@ -188,9 +188,55 @@ pub enum Evidence {
     Note { text: String },
 }
 
+/// The most of one line a finding quotes.
+pub const MAX_QUOTED_LINE: usize = 400;
+
+/// `line`, or the [`MAX_QUOTED_LINE`] bytes around 1-based byte `column` of it, with
+/// `…` where text was left out.
+fn bound_line(line: &str, column: usize) -> String {
+    if line.len() <= MAX_QUOTED_LINE {
+        return line.to_string();
+    }
+    let floor = |mut at: usize| {
+        while !line.is_char_boundary(at) {
+            at -= 1;
+        }
+        at
+    };
+    let wanted = column.saturating_sub(1).min(line.len());
+    let start = floor(wanted.saturating_sub(MAX_QUOTED_LINE / 4));
+    let end = floor((start + MAX_QUOTED_LINE).min(line.len()));
+    let before = if start > 0 { "…" } else { "" };
+    let after = if end < line.len() { "…" } else { "" };
+    format!("{before}{}{after}", &line[start..end])
+}
+
 impl Evidence {
+    /// Source text quoted for a finding, with each line held to [`MAX_QUOTED_LINE`]
+    /// bytes.
+    ///
+    /// Every finding quotes its line, so without a bound the memory a scan needs is
+    /// findings times line length. One 192 KB line of `if (a) a++;` took over 5 GB,
+    /// and the scanned code is not trusted. The finding's own line keeps the
+    /// window around its column, so what is quoted is still what was reported.
     pub fn source(location: Location, first_line: u32, text: impl Into<String>) -> Self {
-        Evidence::Source { location, first_line, text: text.into() }
+        let mut text = text.into();
+        if text.len() > MAX_QUOTED_LINE {
+            let column = |number: usize| {
+                if first_line as usize + number == location.line as usize {
+                    location.column as usize
+                } else {
+                    1
+                }
+            };
+            text = text
+                .split('\n')
+                .enumerate()
+                .map(|(number, line)| bound_line(line, column(number)))
+                .collect::<Vec<_>>()
+                .join("\n");
+        }
+        Evidence::Source { location, first_line, text }
     }
     pub fn note(text: impl Into<String>) -> Self {
         Evidence::Note { text: text.into() }
@@ -284,6 +330,22 @@ mod tests {
         assert!(!Evidence::note("hi").is_defect_witness());
         // Coverage is still runtime-sourced even though it proves nothing by itself.
         assert!(cov.is_runtime());
+    }
+
+    #[test]
+    fn a_long_line_is_quoted_around_the_finding_and_no_further() {
+        let line = format!("{}MARK{}", "é".repeat(5000), "x".repeat(5000));
+        let column = "é".repeat(5000).len() as u32 + 1;
+        let e = Evidence::source(Location::new("a.c", 2, column), 1, format!("short\n{line}\n{line}"));
+        let Evidence::Source { text, .. } = e else { panic!("source evidence") };
+        let lines: Vec<&str> = text.split('\n').collect();
+        assert_eq!(lines[0], "short", "a short line is left whole");
+        assert!(lines[1].contains("MARK"), "the finding's line keeps what it reported: {}", lines[1]);
+        assert!(lines[1].starts_with('…') && lines[1].ends_with('…'));
+        assert!(!lines[2].contains("MARK"), "another line keeps only its start");
+        for quoted in &lines[1..] {
+            assert!(quoted.len() <= MAX_QUOTED_LINE + 2 * '…'.len_utf8(), "{} bytes", quoted.len());
+        }
     }
 
     #[test]

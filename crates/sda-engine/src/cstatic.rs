@@ -665,6 +665,20 @@ struct Cx<'a> {
     findings: Vec<Finding>,
 }
 
+/// A function body's first and last position, each as `(line, column)`.
+type FunctionScope = ((u32, u32), (u32, u32));
+
+/// The index of the function whose body contains `line:column`, if any.
+///
+/// A label's name is only in scope in its own function (C23 6.8.1), so a `goto` and
+/// a label are matched only when they share one of these. Code outside every body
+/// this analyzer read maps to `None`, and `None` matches only `None`.
+fn scope_of(scopes: &[FunctionScope], line: u32, column: u32) -> Option<usize> {
+    let at = (line, column);
+    let after = scopes.partition_point(|(start, _)| *start <= at);
+    after.checked_sub(1).filter(|&k| at <= scopes[k].1)
+}
+
 /// What a `{` opens, as far as the bit-field rule cares.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum BodyKind {
@@ -1695,8 +1709,9 @@ impl<'a> Cx<'a> {
         }
         // Prototypes inside a function body are declarations too. A struct body
         // also sits at nonzero depth, but a member's declarator is not a prototype.
+        let scopes = self.function_scopes();
         for (name, pos, params) in self.block_scope_declarations() {
-            if self.function_scope_of(pos.line, pos.column).is_none() {
+            if scope_of(&scopes, pos.line, pos.column).is_none() {
                 continue;
             }
             if let Some(why) = prototype_fault(&params, self.reads_lone_words(&name, pos)) {
@@ -2287,7 +2302,7 @@ impl<'a> Cx<'a> {
     /// a nested `switch` leaves the switch, not the loop — and each `goto` at any
     /// depth whose label is not in the body, since nesting cannot contain a jump.
     fn count_loop_exits(&self, body: sda_syntax::Span) -> usize {
-        let Some(first) = self.code.iter().position(|t| t.span.start == body.start) else {
+        let Ok(first) = self.code.binary_search_by_key(&body.start, |t| t.span.start) else {
             return 0;
         };
         // Only a braced body has a span: an unbraced loop body is a 15.6
@@ -2312,19 +2327,15 @@ impl<'a> Cx<'a> {
                 _ => i += 1,
             }
         }
-        let labelled_here = |name: &str| {
-            (first + 1..close).any(|m| {
-                self.tok(m) == name
-                    && m + 1 < close
-                    && self.tok(m + 1) == ":"
-                    && matches!(self.tok(m - 1), ";" | "{" | "}" | ":" | ")")
+        let labels: BTreeSet<&str> = (first + 1..close.saturating_sub(1))
+            .filter(|&m| {
+                self.tok(m + 1) == ":" && matches!(self.tok(m - 1), ";" | "{" | "}" | ":" | ")")
             })
-        };
+            .map(|m| self.tok(m))
+            .collect();
         count
-            + (first + 1..close)
-                .filter(|&k| {
-                    self.tok(k) == "goto" && k + 1 < close && !labelled_here(self.tok(k + 1))
-                })
+            + (first + 1..close.saturating_sub(1))
+                .filter(|&k| self.tok(k) == "goto" && !labels.contains(self.tok(k + 1)))
                 .count()
     }
 
@@ -2474,35 +2485,37 @@ impl<'a> Cx<'a> {
 
     // --- jumps ------------------------------------------------------------
 
-    /// The index of the function whose body contains `line:column`, if any.
-    ///
-    /// A label's name is only in scope in its own function (C23 6.8.1), so a
-    /// `goto` and a label are matched only when they share one of these. Code
-    /// outside every body this analyzer read maps to `None`, and `None` matches
-    /// only `None`.
-    fn function_scope_of(&self, line: u32, column: u32) -> Option<usize> {
-        let at = (line, column);
-        self.st.functions.iter().position(|f| {
-            let start = self.lexed.lines.pos(f.body.start);
-            let end = self.lexed.lines.pos(f.body.end);
-            (start.line, start.column) <= at && at <= (end.line, end.column)
-        })
+    /// Where each function's body starts and ends, in order, for [`scope_of`].
+    fn function_scopes(&self) -> Vec<FunctionScope> {
+        let mut scopes: Vec<FunctionScope> = self
+            .st
+            .functions
+            .iter()
+            .map(|f| {
+                let start = self.lexed.lines.pos(f.body.start);
+                let end = self.lexed.lines.pos(f.body.end);
+                ((start.line, start.column), (end.line, end.column))
+            })
+            .collect();
+        scopes.sort_unstable();
+        scopes
     }
 
     fn check_jumps(&mut self) {
         // (name, line, column, enclosing function)
+        let scopes = self.function_scopes();
         let gotos: Vec<(String, u32, u32, Option<usize>)> = self
             .st
             .gotos
             .iter()
-            .map(|(n, p)| (n.clone(), p.line, p.column, self.function_scope_of(p.line, p.column)))
+            .map(|(n, p)| (n.clone(), p.line, p.column, scope_of(&scopes, p.line, p.column)))
             .collect();
         // (name, line, column, enclosing function)
         let labels: Vec<(String, u32, u32, Option<usize>)> = self
             .st
             .labels
             .iter()
-            .map(|(n, p)| (n.clone(), p.line, p.column, self.function_scope_of(p.line, p.column)))
+            .map(|(n, p)| (n.clone(), p.line, p.column, scope_of(&scopes, p.line, p.column)))
             .collect();
 
         for (target, line, col, scope) in &gotos {

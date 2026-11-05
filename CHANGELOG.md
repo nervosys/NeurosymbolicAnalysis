@@ -9,8 +9,19 @@ must read exactly `## [<version>]`.
 
 ## [Unreleased]
 
-MISRA C findings change in both directions, so a baseline taken on 1.0.1 may need
-refreshing.
+## [1.0.2] - 2026-11-04
+
+A security fix, and many corrections to the MISRA C checks. Findings change in both
+directions, so a baseline taken on 1.0.1 may need refreshing.
+
+### Security
+- A small source file could exhaust memory. Every finding quoted its whole line, so
+  a scan needed findings times line length: one 192 KB line of `if (a) a++;` passed
+  5 GB. A finding now quotes at most 400 bytes of a line, around its column. Every
+  earlier release is affected. Scan untrusted code with 1.0.2 or later.
+- Still open: there is no limit on file size or scan time, and crafted input can make
+  a scan slow, such as 169 s for 880 KB of loops nested 40,000 deep. Put a timeout on
+  any job that scans untrusted code.
 
 ### Fixed
 - False positives no longer reported:

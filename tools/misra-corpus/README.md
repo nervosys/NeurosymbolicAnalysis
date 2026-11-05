@@ -33,7 +33,7 @@ shipped.
 ```sh
 python tools/cppcheck-misra-oracle.py \
     crates/sda-engine/tests/fixtures/cppcheck-misra.json \
-    'C:\Users\adamm\tools\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe' \
+    '<tools>\cppcheck-2.21.0\PFiles\Cppcheck\cppcheck.exe' \
     examples/firmware/src/main.c examples/coverage/main.c \
     tools/valgrind-wsl/three-sins/main.c tools/valgrind-wsl/vgwrap.c \
     $(ls tools/misra-corpus/*.c | grep -v atomic_void.c)

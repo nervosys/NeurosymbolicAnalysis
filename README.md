@@ -23,7 +23,7 @@ converts a coverage hole into a clean bill of health.
 
 ## Install
 
-The current release is **1.0.1**. Nothing is signed yet, so Windows SmartScreen
+The current release is **1.0.2**. Nothing is signed yet, so Windows SmartScreen
 and macOS Gatekeeper will warn before the first run.
 Each release carries a `SHA256SUMS` file; check a download against it before
 installing.
@@ -1539,7 +1539,7 @@ toolkit free of any inference dependency.
 
 ## Security
 
-What `sda` does with code you did not write, as of `1.0.1`:
+What `sda` does with code you did not write, as of `1.0.2`:
 
 * **A default scan runs none of the project's code.** The native engines read
   source and model files and parse them; a pickle is walked opcode by opcode,
