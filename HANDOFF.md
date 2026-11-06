@@ -433,12 +433,12 @@ memory, so anyone scanning untrusted code should put a timeout on the job.
 `SECURITY.md` says so. Ordinary input scales about linearly: 40,000 statements took 5.5 s
 to 9.5 s, with findings or without, so the quadratic case is nesting far beyond real code.
 
-**For the owner, on this repository's settings.** Both were refused to an agent by the
-permission classifier, so they are still as they were: turn on secret scanning with
-push protection, and set the default workflow permission to read. Both workflows
-declare their own permissions, so neither change breaks anything. Decide too whether
-1.0.0 and 1.0.1 get a GitHub Security Advisory for the memory bug. A username remains
-in `crates/sda-engine/tests/fixtures/lcov.info` and in the public history.
+**Repository settings after the audit.** On 2026-11-06, at the owner's direction,
+secret scanning with push protection was turned on (no alerts on the history) and the
+default workflow permission set to read. Both workflows declare their own permissions,
+so neither change altered CI. The memory bug has a draft advisory,
+GHSA-376m-gmpm-qffw, rated medium with CWE-770, to publish once 1.0.2 is released. A
+username remains in `crates/sda-engine/tests/fixtures/lcov.info` and in the public history.
 
 **Use `--format json` to compare scans.** The text report stops at about 500 findings
 and prints how many it left out, so a text diff of a large tree silently compares
